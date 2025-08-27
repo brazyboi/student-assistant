@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { sendMessage } from '../api/chat';
 
 export default function ChatInput({
     onSend,
@@ -13,6 +14,7 @@ export default function ChatInput({
         if (!text) return;
         onSend(text);
         setMessage('');
+        sendMessage(text);
     }
 
     return (
