@@ -22,6 +22,14 @@ export default function ChatInput({
                 type="text"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
+                placeholder='Enter your query...'
+                style={{
+                    flex: 1,
+                    padding: '10px 12px',
+                    border: '1px solid #ddd',
+                    borderRadius: 8,
+                    outline: 'none',
+                }}
             />
         </form>
     )

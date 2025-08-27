@@ -1,12 +1,3 @@
-// import { useState } from 'react'
-// import './App.css'
-
-// function App() {
-  
-// }
-
-// export default App
-
 import ChatInput from "./components/ChatInput";
 
 function App() {
