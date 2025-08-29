@@ -33,7 +33,7 @@ app.post('/api/chat', async (req: Request, res: Response) => {
             choices: { message: { content: string } }[];
         };
 
-        const reply = data.choices?.[0]?.message?.content || "";
+        const reply = data.choices?.[0]?.message?.content || "AI No Reply.";
         res.json({ reply });
     } catch (err) {
         console.error(err);
