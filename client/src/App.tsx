@@ -2,9 +2,16 @@ import { useState } from "react";
 import ChatInput from "./components/ChatInput";
 import ChatWindow from "./components/ChatWindow";
 import type { Message } from "./components/ChatWindow";
+import PromptSuggestions from "./components/PromptSuggestions";
 import { sendMessage } from "./api/chat";
 
 export default function App() {
+  const prompts = [
+    "Create a study plan for me",
+    "Summarize this text",
+    "Explain this concept simply",
+  ];
+
   const [messages, setMessages] = useState<Message[]>([]);
 
   async function handleSend(userText: string) {
@@ -17,6 +24,7 @@ export default function App() {
   return (
     <div className="flex flex-col h-full w-full">
       <ChatWindow messages={messages} />
+      <PromptSuggestions prompts={prompts} onSelect={handleSend} />
       <ChatInput onSend={handleSend} />
     </div>
   );
