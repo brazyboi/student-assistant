@@ -7,7 +7,7 @@ interface PromptSuggestionsProps {
 
 const PromptSuggestions: React.FC<PromptSuggestionsProps> = ({ prompts, onSelect }) => {
   return (
-    <div className="flex flex-wrap gap-2 p-4 justify-end bottom-0">
+    <div className="flex flex-wrap mt-auto gap-2 p-4 justify-end bottom-0">
       {prompts.map((prompt, idx) => (
         <button
           key={idx}

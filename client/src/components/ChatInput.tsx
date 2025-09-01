@@ -20,10 +20,10 @@ export default function ChatInput({
     return (
         <form 
         onSubmit={handleSubmit} 
-        className="mt-auto gap-2 bottom-0 left-0 right-0 p-4 flex justify-center"
+        className="gap-2 bottom-0 left-0 right-0 p-4 flex justify-center"
         >
             <input
-                className="flex-1 border rounded-3xl p-4 w-full"
+                className="border rounded-3xl p-4 w-full"
                 autoFocus
                 type="text"
                 value={message}
