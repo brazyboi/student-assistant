@@ -21,24 +21,77 @@ export default function App() {
   ];
 
   const chats: Chat[] = [
-    { id: 1, title: "HIIIII" },
-    { id: 2, title: "yessir" },
+    { 
+      id: 1, 
+      title: "HIIIII", 
+      messages: [ 
+        { text: 'Hello', sender: 'user'},  
+        { text: 'Hi there! How can I assist you today?', sender: 'ai' }
+      ]
+    },
+    { 
+      id: 2, 
+      title: "yessir", 
+      messages: [
+        { text: 'Alternate chat', sender: 'user'},  
+        { text: 'This is the other chat.', sender: 'ai' }
+      ]
+    },
+      
   ];
 
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [chatsState, setChatsState] = useState<Chat[]>(chats);
+  const [selectedChatId, setSelectedChatId] = useState<number | null>(
+    chats[0].id
+  );
+
+  const currentMessages =
+    chatsState.find((chat) => chat.id === selectedChatId)?.messages ?? [];
 
   async function handleSend(userText: string) {
-    setMessages((prev) => [...prev, { sender: "user", text: userText }]);
+    if (selectedChatId === null) return;
 
+    // Optimistically add user message
+    setChatsState((prevChats) =>
+      prevChats.map((chat) =>
+        chat.id === selectedChatId
+          ? {
+              ...chat,
+              messages: [...chat.messages, { sender: "user", text: userText }],
+            }
+          : chat
+      )
+    );
+
+    // Get AI reply
     const reply = await sendMessage(userText);
-    setMessages((prev) => [...prev, { sender: "ai", text: reply }]);
+
+    setChatsState((prevChats) =>
+      prevChats.map((chat) =>
+        chat.id === selectedChatId
+          ? {
+              ...chat,
+              messages: [...chat.messages, { sender: "ai", text: reply }],
+            }
+          : chat
+      )
+    );
   }
+
+  
+
+  // async function handleSend(userText: string) {
+  //   setMessages((prev) => [...prev, { sender: "user", text: userText }]);
+
+  //   const reply = await sendMessage(userText);
+  //   setMessages((prev) => [...prev, { sender: "ai", text: reply }]);
+  // }
 
   return (
     <div className="flex h-screen">
-      <ChatSidebar chats={chats} onSelectChat={() => {}} />
+      <ChatSidebar chats={chats} onSelectChat={setSelectedChatId} selectedChatId={0} />
       <main className="flex flex-col h-full w-full">
-        <ChatWindow messages={messages} />
+        <ChatWindow messages={currentMessages} />
         <PromptSuggestions prompts={prompts} onSelect={handleSend} />
         <ChatInput onSend={handleSend} />
       </main>

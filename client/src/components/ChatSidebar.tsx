@@ -5,12 +5,13 @@ import type { Chat } from "../types";
 interface SidebarProps {
   chats: Chat[];
   onSelectChat: (id: number) => void;
+  selectedChatId: number | null;
 }
 
-export default function ChatSidebar({ chats, onSelectChat } : SidebarProps) {
+export default function ChatSidebar({ chats, onSelectChat, selectedChatId } : SidebarProps) {
     const [sidebarWidth, setSidebarWidth] = useState(350);
     const [isDragging, setDragging] = useState(false);
-    const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
+    // const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
 
     const [startX, setStartX] = useState(0);
     const [startWidth, setStartWidth] = useState(0);
@@ -62,7 +63,7 @@ export default function ChatSidebar({ chats, onSelectChat } : SidebarProps) {
                         key={chat.id} 
                         title={chat.title}
                         selected={chat.id === selectedChatId}
-                        onClick={() => setSelectedChatId(chat.id)}
+                        onClick={() => onSelectChat(chat.id)}
                     />
                 ))}
             </div>
