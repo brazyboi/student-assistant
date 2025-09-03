@@ -54,3 +54,33 @@ h1 {
     background-color: #f9f9f9;
   }
 }
+
+/* Default: hidden */
+.scroll-hover::-webkit-scrollbar {
+  width: 0px;
+  background: transparent; /* optional */
+}
+
+/* On hover: show thin scrollbar */
+.scroll-hover:hover::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scroll-hover:hover::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scroll-hover:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(100, 100, 100, 0.4);
+  border-radius: 3px;
+}
+
+/* Firefox */
+.scroll-hover {
+  scrollbar-width: none; /* hide by default */
+}
+
+.scroll-hover:hover {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(100, 100, 100, 0.4) transparent;
+}

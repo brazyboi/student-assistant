@@ -2,37 +2,15 @@ import { useState, useEffect, useRef } from "react";
 import ChatTab from "./ChatTab";
 import type { Chat } from "../types";
 
-
 interface SidebarProps {
   chats: Chat[];
   onSelectChat: (id: number) => void;
 }
 
 export default function ChatSidebar({ chats, onSelectChat } : SidebarProps) {
-    const [sidebarWidth, setSidebarWidth] = useState(250);
+    const [sidebarWidth, setSidebarWidth] = useState(350);
     const [isDragging, setDragging] = useState(false);
     const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
-
-    // For dragging the sidebar
-    // const mouseStartX = useRef(0);
-    // const sidebarStartWidth = useRef(0);
-
-    // const handleMouseDown = (e: React.MouseEvent) => {
-    //     setDragging(true);
-    //     mouseStartX.current = e.clientX;
-    //     sidebarStartWidth.current = sidebarWidth;
-    //     e.preventDefault();
-    // };
-
-    // const handleMouseMove = (e: React.MouseEvent) => {
-    //     if (!isDragging) return;
-    //     const deltaX = e.clientX - mouseStartX.current;
-    //     setSidebarWidth(Math.max(150, sidebarStartWidth.current + deltaX));
-    // };
-
-    // const handleMouseUp = () => {
-    //     setDragging(false);
-    // };
 
     const [startX, setStartX] = useState(0);
     const [startWidth, setStartWidth] = useState(0);
@@ -74,13 +52,10 @@ export default function ChatSidebar({ chats, onSelectChat } : SidebarProps) {
 
   return (
         <aside
-            className="flex flex-col border-r w-1/4 relative"
-            // onMouseMove={handleMouseMove}
-            // onMouseUp={handleMouseUp}
-            // onMouseLeave={handleMouseUp}
+            className="flex flex-col w-1/3 relative"
             style={{ width: sidebarWidth }}
         >
-            <h2 className="text-center text-4xl font-bold mb-2">Chats</h2>
+            <h2 className="text-center text-4xl py-5 font-bold mb-2">Chats</h2>
             <div className="flex-1">
                 {chats.map((chat) => (
                     <ChatTab 
@@ -93,7 +68,7 @@ export default function ChatSidebar({ chats, onSelectChat } : SidebarProps) {
             </div>
 
             <div
-                className="absolute top-0 right-0 h-full w-5 cursor-ew-resize bg-gray-400"
+                className="absolute top-0 right-0 h-full w-1 cursor-ew-resize bg-gray-600"
                 onMouseDown={handleMouseDown}
             />
            

@@ -5,7 +5,13 @@ export interface Profile {
   role: "general" | "python_expert" | "math_tutor" | "writing_coach";
 }
 
+export interface Message { 
+  text: string; 
+  sender: "user" | "ai";
+};
+
 export interface Chat {
   id: number;
   title: string;
+  messages: Message[];
 }

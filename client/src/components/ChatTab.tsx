@@ -7,8 +7,9 @@ interface ChatTabProps {
 const ChatItem = ({ title, onClick }: ChatTabProps) => {
   return (
     <button
+      type="button"
       onClick={onClick}
-      className="flex items-center w-full p-2 rounded text-left hover:bg-gray-600"
+      className="flex items-center w-full p-4 rounded text-left hover:bg-gray-600"
     >
       <span className="flex-1">{title}</span>
     </button>
