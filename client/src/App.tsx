@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import ChatInput from "./components/ChatInput";
 import ChatWindow from "./components/ChatWindow";
 import PromptSuggestions from "./components/PromptSuggestions";
+import ProfileSelector from "./components/ProfileSelector";
 import ChatSidebar from "./components/ChatSidebar";
 
 // Backend
@@ -90,11 +91,12 @@ export default function App() {
   return (
     <div className="flex h-screen">
       <ChatSidebar chats={chats} onSelectChat={setSelectedChatId} selectedChatId={0} />
-      <main className="flex flex-col h-full w-full">
+      <main className="flex flex-col px-48 h-full w-full">
         <ChatWindow messages={currentMessages} />
         <PromptSuggestions prompts={prompts} onSelect={handleSend} />
         <ChatInput onSend={handleSend} />
       </main>
+      <ProfileSelector />
     </div>
   );
 }

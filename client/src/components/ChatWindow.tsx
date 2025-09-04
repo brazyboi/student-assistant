@@ -14,7 +14,7 @@ export default function ChatWindow({ messages }: { messages: Message[] }) {
   }, [messages]);
 
   return (
-    <div className="flex-1 min-h-0 overflow-y-auto p-4 scroll-hover">
+    <div className="flex-1 min-h-0 overflow-y-auto py-4 scroll-hover">
       {messages.map((msg, idx) => (
         <ChatMessage key={idx} sender={msg.sender} text={msg.text} />
       ))}

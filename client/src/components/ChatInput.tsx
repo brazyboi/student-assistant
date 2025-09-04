@@ -20,7 +20,7 @@ export default function ChatInput({
     return (
         <form 
         onSubmit={handleSubmit} 
-        className="gap-2 bottom-0 left-0 right-0 py-4 px-16 flex justify-center"
+        className="gap-2 bottom-0 left-0 right-0 py-8 flex justify-center"
         >
             <input
                 className="border rounded-3xl p-4 w-full"
