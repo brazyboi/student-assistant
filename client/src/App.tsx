@@ -11,7 +11,6 @@ import ChatSidebar from "./components/ChatSidebar";
 import { sendMessage } from "./api/chat";
 
 // Types
-import type { Message } from "./components/ChatWindow";
 import type { Chat } from "./types";
 
 export default function App() {
