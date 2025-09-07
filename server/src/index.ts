@@ -38,15 +38,20 @@ async function getAIResponse(query: string, mode: 'question' | 'hint' | 'solutio
     });
 
     const data = await response.json() as { choices: { message: { content: string } }[] };
+    
+    if ('error' in data) {
+        return "AI Error: " + (data as any).error.message;
+    }
+
     return data.choices?.[0]?.message?.content || "AI No Reply.";
 }
 
 app.post('/api/chat', async (req: Request, res: Response) => {
     try {
-        const { query, mode, hintIndex } = req.body as { query: string; mode: 'question' | 'hint' | 'solution'; hintIndex?: number };
+        const { message, mode, hintIndex } = req.body as { message: string; mode: 'question' | 'hint' | 'solution'; hintIndex?: number };
 
-        const reply = await getAIResponse(query, mode, hintIndex ?? 1);
-        res.json({ type: mode, message: reply });
+        const reply = await getAIResponse(message, mode, hintIndex ?? 1);
+        res.json({reply: reply});
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'Internal Server Error' });
