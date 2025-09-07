@@ -14,3 +14,7 @@ export interface Chat {
   title: string;
   messages: Message[];
 }
+
+export interface QueryMode {
+  mode: 'question' | 'hint' | 'solution';
+}

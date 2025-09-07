@@ -1,22 +1,28 @@
 import React from "react";
+import type { QueryMode } from "../types";
 
 interface PromptSuggestionsProps {
   prompts: string[];
-  onSelect: (prompt: string) => void;
+  onSelect: (mode: QueryMode, hintIndex: number) => void;
 }
 
 const PromptSuggestions: React.FC<PromptSuggestionsProps> = ({ prompts, onSelect }) => {
   return (
     <div className="flex flex-wrap mt-auto gap-2 p-4 justify-end bottom-0">
-      {prompts.map((prompt, idx) => (
-        <button
-          key={idx}
-          className="px-3 py-2 rounded-lg bg-gray-700 text-white text-sm hover:bg-gray-600"
-          onClick={() => onSelect(prompt)}
-        >
-          {prompt}
-        </button>
-      ))}
+      <button
+        key={0}
+        className="px-3 py-2 rounded-lg bg-gray-700 text-white text-sm hover:bg-gray-600"
+        onClick={() => onSelect({ mode: 'hint' }, 1)}
+      >
+        Hint
+      </button>
+      <button
+        key={1}
+        className="px-3 py-2 rounded-lg bg-gray-700 text-white text-sm hover:bg-gray-600"
+        onClick={() => onSelect({ mode: 'solution' }, 1)}
+      >
+        Solution
+      </button>
     </div>
   );
 };

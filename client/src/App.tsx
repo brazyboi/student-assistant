@@ -12,6 +12,7 @@ import { sendMessage } from "./api/chat";
 
 // Types
 import type { Chat } from "./types";
+import type { QueryMode } from "./types";
 
 export default function App() {
   const prompts = [
@@ -48,7 +49,6 @@ export default function App() {
     chatsState.find((chat) => chat.id === selectedChatId)?.messages ?? [];
 
   async function handleSend(userText: string) {
-    if (selectedChatId === null) return;
 
     // Optimistically add user message
     setChatsState((prevChats) =>
@@ -63,7 +63,7 @@ export default function App() {
     );
 
     // Get AI reply
-    const reply = await sendMessage(userText);
+    const reply = await sendMessage(userText, { mode: 'question' }, 1);
 
     setChatsState((prevChats) =>
       prevChats.map((chat) =>
@@ -77,8 +77,21 @@ export default function App() {
     );
   }
 
-  
+  async function handleHint(mode: QueryMode, hintIndex: number) {
+    const reply = await sendMessage('', mode , hintIndex);
+    setChatsState((prevChats) =>
+      prevChats.map((chat) =>
+        chat.id === selectedChatId
+          ? {
+              ...chat,
+              messages: [...chat.messages, { sender: "ai", text: reply }],
+            }
+          : chat
+      )
+    );
+  }
 
+  
   // async function handleSend(userText: string) {
   //   setMessages((prev) => [...prev, { sender: "user", text: userText }]);
 
@@ -91,7 +104,7 @@ export default function App() {
       <ChatSidebar chats={chats} onSelectChat={setSelectedChatId} selectedChatId={0} />
       <main className="flex flex-col px-48 h-full w-full">
         <ChatWindow messages={currentMessages} />
-        <PromptSuggestions prompts={prompts} onSelect={handleSend} />
+        <PromptSuggestions prompts={prompts} onSelect={handleHint} />
         <ChatInput onSend={handleSend} />
       </main>
       <ProfileSelector />
