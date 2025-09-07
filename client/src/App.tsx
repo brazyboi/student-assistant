@@ -15,9 +15,8 @@ import type { Chat } from "./types";
 
 export default function App() {
   const prompts = [
-    "Create a study plan for me",
-    "Summarize this text",
-    "Explain this concept simply",
+    "Hint",
+    "Reveal Solution",
   ];
 
   const chats: Chat[] = [
