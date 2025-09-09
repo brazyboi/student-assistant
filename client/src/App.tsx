@@ -37,6 +37,8 @@ export default function App() {
   const currentMessages =
     chatsState.find((chat) => chat.id === selectedChatId)?.messages ?? [];
 
+  const [loading, setLoading] = useState(false);
+
   async function handleSend(userText: string) {
     const selectedChat = chatsState.find((c) => c.id === selectedChatId);
     if (!selectedChat) return;
@@ -53,19 +55,27 @@ export default function App() {
       )
     );
 
-    // Get AI reply
-    const reply = await sendMessage(selectedChat, userText, 'question');
+    setLoading(true);
 
-    setChatsState((prevChats) =>
-      prevChats.map((chat) =>
-        chat.id === selectedChatId
-          ? {
-              ...chat,
-              messages: [...chat.messages, { sender: "ai", text: reply }],
-            }
-          : chat
-      )
-    );
+    try {
+      // Get AI reply
+      const reply = await sendMessage(selectedChat, userText, 'question');
+
+      setChatsState((prevChats) =>
+        prevChats.map((chat) =>
+          chat.id === selectedChatId
+            ? {
+                ...chat,
+                messages: [...chat.messages, { sender: "ai", text: reply }],
+              }
+            : chat
+        )
+      );
+
+
+    } finally {
+      setLoading(false);
+    }
   }
 
   // async function handleHint(mode: QueryMode, hintIndex: number) {
@@ -92,7 +102,7 @@ export default function App() {
         </main>
       ) : (
         <main className="flex flex-col px-32 h-full w-full">
-          <ChatWindow messages={currentMessages} />
+          <ChatWindow messages={currentMessages} loading={loading}/>
           {/* <PromptSuggestions prompts={prompts} onSelect={handleHint} /> */}
           <ChatInput onSend={handleSend} />
         </main>
