@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { sendMessage } from '../api/chat';
 
 export default function ChatInput({
     onSend,
@@ -14,13 +13,12 @@ export default function ChatInput({
         if (!text) return;
         onSend(text);
         setMessage('');
-        sendMessage(text);
     }
 
     return (
         <form 
         onSubmit={handleSubmit} 
-        className="gap-2 bottom-0 left-0 right-0 py-8 flex justify-center"
+        className="gap-2 bottom-0 left-0 right-0 py-8 flex justify-center w-full"
         >
             <input
                 className="border rounded-3xl p-4 w-full"

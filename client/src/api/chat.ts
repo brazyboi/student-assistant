@@ -17,14 +17,15 @@ export async function sendMessage(
     Do not provide direct answers unless explicitly asked for a solution.
     If the student asks for a hint (if mode = "hint"), provide a subtle nudge.
     If the student asks for a solution (if mode = "solution"), provide a clear, step-by-step solution.
-    If the mode = "question", respond with a question that encourages critical thinking.
+    If the mode = "question", save this question in context and respond that you have noted it. This will be the main problem we will work on.
+    Additionally, never go off topic from the subject of the question. If they ask something unrelated, steer themn back to the topic of the question.
   `;
 
   const response = await fetch('http://localhost:3000/api/chat', {
     method: 'POST',
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      systemPrompt,
+      // systemPrompt,
       messages: [
         { role: "system", content: systemPrompt },
         ...history,

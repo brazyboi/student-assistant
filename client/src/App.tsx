@@ -23,21 +23,10 @@ export default function App() {
   const chats: Chat[] = [
     { 
       id: 1, 
-      title: "HIIIII", 
+      title: "Current Chat", 
       messages: [ 
-        { text: 'Hello', sender: 'user'},  
-        { text: 'Hi there! How can I assist you today?', sender: 'ai' }
       ]
     },
-    { 
-      id: 2, 
-      title: "yessir", 
-      messages: [
-        { text: 'Alternate chat', sender: 'user'},  
-        { text: 'This is the other chat.', sender: 'ai' }
-      ]
-    },
-      
   ];
 
   const [chatsState, setChatsState] = useState<Chat[]>(chats);
@@ -93,22 +82,21 @@ export default function App() {
   //   );
   // }
 
-  
-  // async function handleSend(userText: string) {
-  //   setMessages((prev) => [...prev, { sender: "user", text: userText }]);
-
-  //   const reply = await sendMessage(userText);
-  //   setMessages((prev) => [...prev, { sender: "ai", text: reply }]);
-  // }
-
   return (
     <div className="flex h-screen">
       <ChatSidebar chats={chats} onSelectChat={setSelectedChatId} selectedChatId={0} />
-      <main className="flex flex-col px-48 h-full w-full">
-        <ChatWindow messages={currentMessages} />
-        {/* <PromptSuggestions prompts={prompts} onSelect={handleHint} /> */}
-        <ChatInput onSend={handleSend} />
-      </main>
+      {currentMessages.length === 0 ? (
+        <main className="flex flex-col h-full w-full px-32 items-center justify-center">
+          <h1>Student Assistant</h1>
+          <ChatInput onSend={handleSend} />
+        </main>
+      ) : (
+        <main className="flex flex-col px-32 h-full w-full">
+          <ChatWindow messages={currentMessages} />
+          {/* <PromptSuggestions prompts={prompts} onSelect={handleHint} /> */}
+          <ChatInput onSend={handleSend} />
+        </main>
+      )}
       <ProfileSelector />
     </div>
   );

@@ -53,7 +53,7 @@ export default function ChatSidebar({ chats, onSelectChat, selectedChatId } : Si
 
   return (
         <aside
-            className="flex flex-col w-1/3 relative"
+            className="flex flex-col w-1/3 relative p-2"
             style={{ width: sidebarWidth }}
         >
             <h2 className="text-center text-4xl py-5 font-bold mb-2">Chats</h2>
