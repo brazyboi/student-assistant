@@ -1,14 +1,16 @@
 import { useState, useEffect, useRef } from "react";
 import ChatTab from "./ChatTab";
+import AddChatButton from "./AddChatButton";
 import type { Chat } from "../types";
 
 interface SidebarProps {
-  chats: Chat[];
-  onSelectChat: (id: number) => void;
-  selectedChatId: number | null;
+    chats: Chat[];
+    onSelectChat: (id: number) => void;
+    selectedChatId: number | null;
+    onAddChat: () => void;
 }
 
-export default function ChatSidebar({ chats, onSelectChat, selectedChatId } : SidebarProps) {
+export default function ChatSidebar({ chats, onSelectChat, selectedChatId, onAddChat } : SidebarProps) {
     const [sidebarWidth, setSidebarWidth] = useState(350);
     const [isDragging, setDragging] = useState(false);
     // const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
@@ -66,7 +68,9 @@ export default function ChatSidebar({ chats, onSelectChat, selectedChatId } : Si
                         onClick={() => onSelectChat(chat.id)}
                     />
                 ))}
+
             </div>
+            <AddChatButton onAdd={onAddChat} />
 
             <div
                 className="absolute top-0 right-0 h-full w-1 cursor-ew-resize bg-gray-600"

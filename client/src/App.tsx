@@ -1,25 +1,19 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 // Components
 import ChatInput from "./components/ChatInput";
 import ChatWindow from "./components/ChatWindow";
-import PromptSuggestions from "./components/PromptSuggestions";
 import ProfileSelector from "./components/ProfileSelector";
 import ChatSidebar from "./components/ChatSidebar";
+import ProblemHelpButton from "./components/ProblemHelpButton";
 
 // Backend
 import { sendMessage } from "./api/chat";
 
 // Types
-import type { Chat } from "./types";
-import type { QueryMode } from "./types";
+import type { Chat, QueryMode } from "./types";
 
 export default function App() {
-  const prompts = [
-    "Hint",
-    "Reveal Solution",
-  ];
-
   const chats: Chat[] = [
     { 
       id: 1, 
@@ -78,23 +72,51 @@ export default function App() {
     }
   }
 
-  // async function handleHint(mode: QueryMode, hintIndex: number) {
-  //   const reply = await sendMessage('', mode , hintIndex);
-  //   setChatsState((prevChats) =>
-  //     prevChats.map((chat) =>
-  //       chat.id === selectedChatId
-  //         ? {
-  //             ...chat,
-  //             messages: [...chat.messages, { sender: "ai", text: reply }],
-  //           }
-  //         : chat
-  //     )
-  //   );
-  // }
+  async function handleHint() {
+    const selectedChat = chatsState.find((c) => c.id === selectedChatId);
+    if (!selectedChat) return;
+
+    setLoading(true);
+
+    try {
+      // Get AI reply
+      const reply = await sendMessage(selectedChat, '', 'hint');
+
+      setChatsState((prevChats) =>
+        prevChats.map((chat) =>
+          chat.id === selectedChatId
+            ? {
+                ...chat,
+                messages: [...chat.messages, { sender: "ai", text: reply }],
+              }
+            : chat
+        )
+      );
+
+
+    } finally {
+      setLoading(false);
+    }
+  }
+  
+
+  function handleAddChat() {
+    setChatsState((prevChats) => {
+      const newId = prevChats.length > 0 ? Math.max(...prevChats.map(c => c.id)) + 1 : 1;
+      const newChat = { id: newId, title: `Chat ${newId}`, messages: [] };
+      setSelectedChatId(newId);
+      return [...prevChats, newChat];
+    });
+  }
 
   return (
     <div className="flex h-screen">
-      <ChatSidebar chats={chats} onSelectChat={setSelectedChatId} selectedChatId={0} />
+      <ChatSidebar 
+        chats={chatsState} 
+        onSelectChat={setSelectedChatId} 
+        selectedChatId={selectedChatId}
+        onAddChat={handleAddChat}
+      />
       {currentMessages.length === 0 ? (
         <main className="flex flex-col h-full w-full px-32 items-center justify-center">
           <h1>Student Assistant</h1>
@@ -103,7 +125,7 @@ export default function App() {
       ) : (
         <main className="flex flex-col px-32 h-full w-full">
           <ChatWindow messages={currentMessages} loading={loading}/>
-          {/* <PromptSuggestions prompts={prompts} onSelect={handleHint} /> */}
+          <ProblemHelpButton type='hint' onClick={handleHint}/>
           <ChatInput onSend={handleSend} />
         </main>
       )}

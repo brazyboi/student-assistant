@@ -4,12 +4,13 @@ interface ChatTabProps {
   onClick?: () => void;
 }
 
-const ChatItem = ({ title, onClick }: ChatTabProps) => {
+
+const ChatItem = ({ title, selected, onClick }: ChatTabProps) => {
   return (
     <button
       type="button"
       onClick={onClick}
-      className="flex items-center w-full p-4 rounded text-left hover:bg-gray-600"
+      className={`flex items-center w-full p-4 rounded text-left hover:bg-sky-800 transition-colors ${selected ? 'bg-sky-700 text-white font-bold' : ''}`}
     >
       <span className="flex-1">{title}</span>
     </button>
