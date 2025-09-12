@@ -1,19 +1,28 @@
+import Button from '@mui/material/Button';
+
 interface ChatTabProps {
   title: string;
   selected?: boolean;
   onClick?: () => void;
 }
 
-
 const ChatItem = ({ title, selected, onClick }: ChatTabProps) => {
   return (
-    <button
-      type="button"
+    <Button
+      fullWidth
+      variant={selected ? "contained" : "text"}
+      color={selected ? "primary" : "inherit"}
       onClick={onClick}
-      className={`flex items-center w-full p-4 rounded text-left hover:bg-sky-800 transition-colors ${selected ? 'bg-sky-700 text-white font-bold' : ''}`}
+      sx={{
+        justifyContent: "flex-start",
+        fontWeight: selected ? "bold" : "normal",
+        textTransform: "none",
+        fontSize: '1.2rem',
+        mb: 1,
+      }}
     >
-      <span className="flex-1">{title}</span>
-    </button>
+      {title}
+    </Button>
   );
 };
 

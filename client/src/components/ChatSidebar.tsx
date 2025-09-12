@@ -11,7 +11,7 @@ interface SidebarProps {
 }
 
 export default function ChatSidebar({ chats, onSelectChat, selectedChatId, onAddChat } : SidebarProps) {
-    const [sidebarWidth, setSidebarWidth] = useState(350);
+    const [sidebarWidth, setSidebarWidth] = useState(500);
     const [isDragging, setDragging] = useState(false);
     // const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
 
@@ -58,7 +58,7 @@ export default function ChatSidebar({ chats, onSelectChat, selectedChatId, onAdd
             className="flex flex-col w-1/3 relative p-2"
             style={{ width: sidebarWidth }}
         >
-            <h2 className="text-center text-4xl py-5 font-bold mb-2">Chats</h2>
+            <h2 className="text-center text-5xl mt-5 py-5 mb-2">Chats</h2>
             <div className="flex-1">
                 {chats.map((chat) => (
                     <ChatTab 

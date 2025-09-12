@@ -3,6 +3,7 @@ import type { Request, Response } from 'express';
 import fetch from 'node-fetch';
 import cors from 'cors'
 import dotenv from 'dotenv';
+import pool from './db.js';
 
 dotenv.config();
 
@@ -36,39 +37,40 @@ async function getAIResponse(
     return data.choices?.[0]?.message?.content || "AI No Reply.";
 }
 
-// async function getAIResponse(query: string, mode: 'question' | 'hint' | 'solution', hintIndex = 1) {
-//     const systemPrompt = `
-//         You are an expert Socratic tutor.
-//         Your task is to guide students to find answers on their own through questions.
-//         Do not provide direct answers unless explicitly asked for a solution.
-//         If the student asks for a hint (if mode = "hint"), provide a subtle nudge towards the answer.
-//         If the student asks for a solution (if mode = "solution), provide a clear and concise answer, fully worked out and step by step.
-//         If the mode = "question", always respond with a question that encourages critical thinking.
-//         Always encourage critical thinking and exploration.
-//     `
+// Create a new profile
+app.post('/api/profiles', async (req: Request, res: Response) => {
+  const { name } = req.body;
+  const result = await pool.query(
+    'INSERT INTO profiles (name) VALUES ($1) RETURNING id, name',
+    [name]
+  );
+  res.json(result.rows[0]);
+});
 
-//     const response = await fetch('https://api.openai.com/v1/chat/completions', {
-//         method: "POST",
-//         headers: {
-//             'Content-Type': 'application/json',
-//             'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-//         },
-//         body: JSON.stringify({
-//             model: "gpt-4o-mini",
-//             messages: [
-//                 { role: "system", content: systemPrompt },
-//             ]
-//         }),
-//     });
+// Get all profiles
+app.get('/api/profiles', async (req: Request, res: Response) => {
+  const result = await pool.query('SELECT * FROM profiles');
+  res.json(result.rows);
+});
 
-//     const data = await response.json() as { choices: { message: { content: string } }[] };
-    
-//     if ('error' in data) {
-//         return "AI Error: " + (data as any).error.message;
-//     }
+// Save a chat for a profile
+app.post('/api/chats', async (req: Request, res: Response) => {
+  const { profileId, title, messages } = req.body;
+  const result = await pool.query(
+    'INSERT INTO chats (profile_id, title, messages) VALUES ($1, $2, $3) RETURNING id',
+    [profileId, title, JSON.stringify(messages)]
+  );
+  res.json({ id: result.rows[0].id });
+});
 
-//     return data.choices?.[0]?.message?.content || "AI No Reply.";
-// }
+// Get all chats for a profile
+app.get('/api/chats/:profileId', async (req: Request, res: Response) => {
+  const result = await pool.query(
+    'SELECT * FROM chats WHERE profile_id = $1',
+    [req.params.profileId]
+  );
+  res.json(result.rows);
+});
 
 app.post('/api/chat', async (req: Request, res: Response) => {
     try {
@@ -85,3 +87,18 @@ app.post('/api/chat', async (req: Request, res: Response) => {
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
+
+(async () => {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS profiles (
+      id SERIAL PRIMARY KEY,
+      name TEXT NOT NULL
+    );
+    CREATE TABLE IF NOT EXISTS chats (
+      id SERIAL PRIMARY KEY,
+      profile_id INTEGER NOT NULL REFERENCES profiles(id),
+      title TEXT,
+      messages JSONB
+    );
+  `);
+})();
