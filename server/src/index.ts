@@ -3,7 +3,9 @@ import type { Request, Response } from 'express';
 import fetch from 'node-fetch';
 import cors from 'cors'
 import dotenv from 'dotenv';
-import pool from './db.js';
+// import pool from './db.js';
+import { Pool } from 'pg';
+
 
 dotenv.config();
 
@@ -12,6 +14,11 @@ app.use(cors());
 app.use(express.json());
 
 const PORT = process.env.PORT || 3000;
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL, // Set this in your .env file
+});
+
 
 async function getAIResponse(
     conversation: { role: "user" | "system"; content: string }[],
