@@ -117,6 +117,7 @@ export default function App() {
         selectedChatId={selectedChatId}
         onAddChat={handleAddChat}
       />
+      <ProfileSelector />
       {currentMessages.length === 0 ? (
         <main className="flex flex-col h-full w-full px-32 items-center justify-center">
           <h1>Student Assistant</h1>

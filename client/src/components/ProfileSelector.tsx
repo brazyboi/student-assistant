@@ -1,56 +1,174 @@
-import { useState, useRef, useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { createProfile, getProfiles } from "../api/profiles";
+import Avatar from "@mui/material/Avatar";
+import IconButton from "@mui/material/IconButton";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import ListItemText from "@mui/material/ListItemText";
+import Divider from "@mui/material/Divider";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import Stack from "@mui/material/Stack";
 
-export default function ProfileMenu() {
-  const [open, setOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
+interface Profile {
+  id: number;
+  name: string;
+}
 
-  // Close menu on outside click
+export default function ProfileSelector({
+  onSelect,
+}: {
+  onSelect?: (profile: Profile) => void;
+}) {
+  const [profiles, setProfiles] = useState<Profile[]>([]);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [newName, setNewName] = useState("");
+
   useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
+    getProfiles().then(setProfiles);
   }, []);
 
-  return (
-    <div className="absolute top-4 right-4" ref={menuRef}>
-      {/* Profile Button */}
-      <button
-        onClick={() => setOpen((prev) => !prev)}
-        className="rounded-full bg-gray-100 hover:bg-gray-200 p-1 shadow"
-      >
-        <img
-          src="../assets/react.svg"
-          alt="Profile"
-          className="w-8 h-8 rounded-full"
-        />
-      </button>
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
 
-      {/* Dropdown Overlay */}
-      {open && (
-        <div className="absolute right-0 mt-2 w-32 rounded-xl p-2 bg-gray-900 shadow-lg z-50">
-          <ul className="flex flex-col text-sm">
-            <li>
-              <button className="w-full rounded-xl text-left px-4 py-2 hover:bg-gray-500">
-                Profile
-              </button>
-            </li>
-            <li>
-              <button className="w-full rounded-xl text-left px-4 py-2 hover:bg-gray-500">
-                Settings
-              </button>
-            </li>
-            <li>
-              <button className="w-full rounded-xl text-left px-4 py-2 text-red-500 hover:bg-gray-500">
-                Logout
-              </button>
-            </li>
-          </ul>
-        </div>
-      )}
-    </div>
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleSelect = (id: number) => {
+    setSelectedId(id);
+    const profile = profiles.find((p) => p.id === id);
+    if (profile && onSelect) onSelect(profile);
+    handleMenuClose();
+  };
+
+  const handleDialogOpen = () => {
+    setDialogOpen(true);
+    setNewName("");
+    handleMenuClose();
+  };
+
+  const handleDialogClose = () => {
+    setDialogOpen(false);
+    setNewName("");
+  };
+
+  const handleCreate = async () => {
+    if (!newName.trim()) return;
+    const profile = await createProfile(newName.trim());
+    setProfiles((prev) => [...prev, profile]);
+    setSelectedId(profile.id);
+    if (onSelect) onSelect(profile);
+    handleDialogClose();
+  };
+
+  return (
+    <>
+      <IconButton
+        onClick={handleMenuOpen}
+        sx={{ position: "absolute", top: 16, right: 16 }}
+        size="large"
+      >
+        <Avatar alt="Profile" src="" />
+      </IconButton>
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleMenuClose}
+        PaperProps={{
+          sx: { minWidth: 200 },
+        }}
+      >
+        <MenuItem disabled>
+          <ListItemText primary="Select Profile" />
+        </MenuItem>
+        <Divider />
+        {profiles.map((profile) => (
+          <MenuItem
+            key={profile.id}
+            selected={profile.id === selectedId}
+            onClick={() => handleSelect(profile.id)}
+          >
+            <ListItemText
+              primary={profile.name}
+              primaryTypographyProps={{
+                fontWeight: profile.id === selectedId ? "bold" : "normal",
+              }}
+            />
+          </MenuItem>
+        ))}
+        <Divider />
+        <MenuItem onClick={handleDialogOpen}>
+          {/* <AddIcon fontSize="small" sx={{ mr: 1 }} /> */}
+          <ListItemText primary="Create Account" />
+        </MenuItem>
+        <Divider />
+        <MenuItem>
+          <ListItemText primary="Settings" />
+        </MenuItem>
+        <MenuItem>
+          <ListItemText primary="Logout" sx={{ color: "red" }} />
+        </MenuItem>
+      </Menu>
+      <CreateProfileDialog
+        open={dialogOpen}
+        onClose={handleDialogClose}
+        onCreate={handleCreate}
+        newName={newName}
+        setNewName={setNewName}
+      />
+    </>
+  );
+}
+
+// New component for the popup dialog
+function CreateProfileDialog({
+  open,
+  onClose,
+  onCreate,
+  newName,
+  setNewName,
+}: {
+  open: boolean;
+  onClose: () => void;
+  onCreate: () => void;
+  newName: string;
+  setNewName: (v: string) => void;
+}) {
+  return (
+    <Dialog open={open} onClose={onClose}>
+      <DialogTitle>Create New Profile</DialogTitle>
+      <DialogContent>
+        <Stack spacing={2} sx={{ mt: 1 }}>
+          <TextField
+            autoFocus
+            label="Profile Name"
+            value={newName}
+            onChange={(e) => setNewName(e.target.value)}
+            fullWidth
+            onKeyDown={(e) => {
+              if (e.key === "Enter") onCreate();
+            }}
+          />
+        </Stack>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose}>Cancel</Button>
+        <Button
+          onClick={onCreate}
+          variant="contained"
+          disabled={!newName.trim()}
+        >
+          Create
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 }
