@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { Button } from '@mui/material';
+import SendIcon from '@mui/icons-material/Send';
 
 export default function ChatInput({
     onSend,
@@ -28,12 +30,19 @@ export default function ChatInput({
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder='Enter your message...'
             />
-            <button
+            {/* <button
                 type='submit'
                 className='px-4 py-2 bg-blue-500 text-white rounded-3xl hover:bg-blue-600'
             >
                 Send
-            </button>
+            </button> */}
+            <Button 
+                variant="contained" 
+                type="submit"
+                sx = {{ borderRadius: '24px' }}
+            >
+                <SendIcon />
+            </Button>
         </form>
     )
 }

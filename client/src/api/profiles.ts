@@ -1,5 +1,5 @@
 // Create a new profile
-async function createProfile(name: string) {
+export async function createProfile(name: string) {
   const res = await fetch('/api/profiles', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -9,7 +9,7 @@ async function createProfile(name: string) {
 }
 
 // Get all profiles
-async function getProfiles() {
+export async function getProfiles() {
   const res = await fetch('/api/profiles');
   return res.json();
 }
