@@ -16,5 +16,5 @@ export interface Chat {
 }
 
 export interface QueryMode {
-  mode: 'question' | 'hint' | 'solution';
+  mode: 'question' | 'hint' | 'answer' | 'explanation';
 }

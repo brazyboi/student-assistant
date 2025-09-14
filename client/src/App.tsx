@@ -53,7 +53,7 @@ export default function App() {
 
     try {
       // Get AI reply
-      const reply = await sendMessage(selectedChat, userText, 'question');
+      const reply = await sendMessage(selectedChat, userText, { mode: 'question' });
 
       setChatsState((prevChats) =>
         prevChats.map((chat) =>
@@ -72,7 +72,7 @@ export default function App() {
     }
   }
 
-  async function handleHint() {
+  async function handleHelpClick(helpType: QueryMode) {
     const selectedChat = chatsState.find((c) => c.id === selectedChatId);
     if (!selectedChat) return;
 
@@ -80,7 +80,7 @@ export default function App() {
 
     try {
       // Get AI reply
-      const reply = await sendMessage(selectedChat, '', 'hint');
+      const reply = await sendMessage(selectedChat, '', helpType);
 
       setChatsState((prevChats) =>
         prevChats.map((chat) =>
@@ -126,7 +126,7 @@ export default function App() {
       ) : (
         <main className="flex flex-col px-32 h-full w-full">
           <ChatWindow messages={currentMessages} loading={loading}/>
-          <ProblemHelpButtonGroup onHint={handleHint} onAnswer={handleHint} onExplanation={handleHint}/>
+          <ProblemHelpButtonGroup onHint={() => handleHelpClick({ mode: "hint"} )} onAnswer={() => handleHelpClick({ mode: "answer" })} onExplanation={() => handleHelpClick({ mode: "explanation" })}/>
           <ChatInput onSend={handleSend} />
         </main>
       )}

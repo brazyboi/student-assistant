@@ -1,9 +1,9 @@
-import type {Chat} from "../types";
+import type {Chat, QueryMode} from "../types";
 
 export async function sendMessage(
   chat: Chat, 
   userMessage: string | null,
-  mode: 'question' | 'hint' | 'solution',
+  mode: QueryMode,
   hintIndex = 1
 ): Promise<string> {
   const history = (chat?.messages ?? []).map(msg => ({
