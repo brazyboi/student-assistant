@@ -81,7 +81,11 @@ app.get('/api/chats/:profileId', async (req: Request, res: Response) => {
 
 app.post('/api/chat', async (req: Request, res: Response) => {
     try {
-        const { messages, mode, hintIndex } = req.body as { messages: { role: "user" | "system"; content: string }[]; mode: 'question' | 'hint' | 'solution'; hintIndex?: number };
+        const { messages, mode, hintIndex } = req.body as { 
+          messages: { role: "user" | "system"; content: string }[]; 
+          mode: 'question' | 'hint' | 'answer' | 'explanation'; 
+          hintIndex?: number 
+        };
 
         const reply = await getAIResponse(messages);
         res.json({reply: reply});
