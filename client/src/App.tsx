@@ -5,7 +5,7 @@ import ChatInput from "./components/ChatInput";
 import ChatWindow from "./components/ChatWindow";
 import ProfileSelector from "./components/ProfileSelector";
 import ChatSidebar from "./components/ChatSidebar";
-import ProblemHelpButton from "./components/ProblemHelpButton";
+import ProblemHelpButtonGroup from "./components/ProblemHelpButton";
 
 // Backend
 import { sendMessage } from "./api/chat";
@@ -126,7 +126,7 @@ export default function App() {
       ) : (
         <main className="flex flex-col px-32 h-full w-full">
           <ChatWindow messages={currentMessages} loading={loading}/>
-          <ProblemHelpButton type='hint' onClick={handleHint}/>
+          <ProblemHelpButtonGroup onHint={handleHint} onAnswer={handleHint} onExplanation={handleHint}/>
           <ChatInput onSend={handleSend} />
         </main>
       )}

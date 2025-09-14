@@ -1,4 +1,5 @@
 import React from "react";
+import { Button } from "@mui/material";
 
 interface AddChatButtonProps {
   onAdd: () => void;
@@ -6,13 +7,19 @@ interface AddChatButtonProps {
 
 const AddChatButton: React.FC<AddChatButtonProps> = ({ onAdd }) => {
   return (
-    <button
-      type="button"
-      className="w-full p-2 mt-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+    <Button
+      // className="w-full p-2 mt-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+      variant="contained"
+      color="success"
+      sx={{ 
+        borderRadius: '24px', 
+        mb: 1, 
+        mx: 1,
+      }}
       onClick={onAdd}
     >
       + New Chat
-    </button>
+    </Button>
   );
 };
 
