@@ -3,7 +3,8 @@ import { useState } from "react";
 // Components
 import ChatInput from "./components/ChatInput";
 import ChatWindow from "./components/ChatWindow";
-import ProfileSelector from "./components/ProfileSelector";
+import ProfileSelector from "./components/ProfileDialog";
+import ProfileButton from "./components/ProfileButton"
 import ChatSidebar from "./components/ChatSidebar";
 import ProblemHelpButtonGroup from "./components/ProblemHelpButton";
 
@@ -11,7 +12,7 @@ import ProblemHelpButtonGroup from "./components/ProblemHelpButton";
 import { sendMessage } from "./api/chat";
 
 // Types
-import type { Chat, QueryMode } from "./types";
+import type { Chat, QueryMode, Profile } from "./types";
 
 export default function App() {
   const chats: Chat[] = [
@@ -23,13 +24,11 @@ export default function App() {
     },
   ];
 
+  const [activeProfile, setActiveProfile] = useState<Profile | null>(null);
   const [chatsState, setChatsState] = useState<Chat[]>(chats);
-  const [selectedChatId, setSelectedChatId] = useState<number | null>(
-    chats[0].id
-  );
+  const [selectedChatId, setSelectedChatId] = useState<number | null>( chats[0].id );
 
-  const currentMessages =
-    chatsState.find((chat) => chat.id === selectedChatId)?.messages ?? [];
+  const currentMessages = chatsState.find((chat) => chat.id === selectedChatId)?.messages ?? [];
 
   const [loading, setLoading] = useState(false);
 
@@ -99,7 +98,6 @@ export default function App() {
     }
   }
   
-
   function handleAddChat() {
     setChatsState((prevChats) => {
       const newId = prevChats.length > 0 ? Math.max(...prevChats.map(c => c.id)) + 1 : 1;
@@ -129,7 +127,7 @@ export default function App() {
           <ChatInput onSend={handleSend} />
         </main>
       )}
-      <ProfileSelector />
+      <ProfileButton />
     </div>
   );
 }
