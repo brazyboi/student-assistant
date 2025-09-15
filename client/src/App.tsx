@@ -117,14 +117,13 @@ export default function App() {
         selectedChatId={selectedChatId}
         onAddChat={handleAddChat}
       />
-      <ProfileSelector />
       {currentMessages.length === 0 ? (
-        <main className="flex flex-col h-full w-full px-32 items-center justify-center">
+        <main className="flex flex-col h-full w-full px-48 items-center justify-center">
           <h1>Student Assistant</h1>
           <ChatInput onSend={handleSend} />
         </main>
       ) : (
-        <main className="flex flex-col px-32 h-full w-full">
+        <main className="flex flex-col px-48 h-full w-full">
           <ChatWindow messages={currentMessages} loading={loading}/>
           <ProblemHelpButtonGroup onHint={() => handleHelpClick({ mode: "hint"} )} onAnswer={() => handleHelpClick({ mode: "answer" })} onExplanation={() => handleHelpClick({ mode: "explanation" })}/>
           <ChatInput onSend={handleSend} />

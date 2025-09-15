@@ -1,174 +1,71 @@
-import React, { useEffect, useState } from "react";
-import { createProfile, getProfiles } from "../api/profiles";
-import Avatar from "@mui/material/Avatar";
-import IconButton from "@mui/material/IconButton";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
-import ListItemText from "@mui/material/ListItemText";
-import Divider from "@mui/material/Divider";
+import * as React from "react";
+import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
-import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
-import Stack from "@mui/material/Stack";
+import Box from "@mui/material/Box";
 
-interface Profile {
-  id: number;
-  name: string;
-}
+export default function ProfileDialog() {
+  const [open, setOpen] = React.useState(false);
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
 
-export default function ProfileSelector({
-  onSelect,
-}: {
-  onSelect?: (profile: Profile) => void;
-}) {
-  const [profiles, setProfiles] = useState<Profile[]>([]);
-  const [selectedId, setSelectedId] = useState<number | null>(null);
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [newName, setNewName] = useState("");
+  const handleClickOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
 
-  useEffect(() => {
-    getProfiles().then(setProfiles);
-  }, []);
-
-  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
-
-  const handleSelect = (id: number) => {
-    setSelectedId(id);
-    const profile = profiles.find((p) => p.id === id);
-    if (profile && onSelect) onSelect(profile);
-    handleMenuClose();
-  };
-
-  const handleDialogOpen = () => {
-    setDialogOpen(true);
-    setNewName("");
-    handleMenuClose();
-  };
-
-  const handleDialogClose = () => {
-    setDialogOpen(false);
-    setNewName("");
-  };
-
-  const handleCreate = async () => {
-    if (!newName.trim()) return;
-    const profile = await createProfile(newName.trim());
-    setProfiles((prev) => [...prev, profile]);
-    setSelectedId(profile.id);
-    if (onSelect) onSelect(profile);
-    handleDialogClose();
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    console.log("Form submitted:", { email, password });
+    // TODO: call your createProfile() or API here
+    handleClose();
   };
 
   return (
-    <>
-      <IconButton
-        onClick={handleMenuOpen}
-        sx={{ position: "absolute", top: 16, right: 16 }}
-        size="large"
+    <div>
+      <Button variant="outlined" onClick={handleClickOpen}>
+        Open Profile Dialog
+      </Button>
+
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="profile-dialog-title"
       >
-        <Avatar alt="Profile" src="" />
-      </IconButton>
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleMenuClose}
-        PaperProps={{
-          sx: { minWidth: 200 },
-        }}
-      >
-        <MenuItem disabled>
-          <ListItemText primary="Select Profile" />
-        </MenuItem>
-        <Divider />
-        {profiles.map((profile) => (
-          <MenuItem
-            key={profile.id}
-            selected={profile.id === selectedId}
-            onClick={() => handleSelect(profile.id)}
-          >
-            <ListItemText
-              primary={profile.name}
-              primaryTypographyProps={{
-                fontWeight: profile.id === selectedId ? "bold" : "normal",
-              }}
+        <DialogTitle id="profile-dialog-title">Create Profile</DialogTitle>
+        <Box component="form" onSubmit={handleSubmit}>
+          <DialogContent dividers>
+            <TextField
+              autoFocus
+              required
+              margin="dense"
+              id="email"
+              label="Email Address"
+              type="email"
+              fullWidth
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
-          </MenuItem>
-        ))}
-        <Divider />
-        <MenuItem onClick={handleDialogOpen}>
-          {/* <AddIcon fontSize="small" sx={{ mr: 1 }} /> */}
-          <ListItemText primary="Create Account" />
-        </MenuItem>
-        <Divider />
-        <MenuItem>
-          <ListItemText primary="Settings" />
-        </MenuItem>
-        <MenuItem>
-          <ListItemText primary="Logout" sx={{ color: "red" }} />
-        </MenuItem>
-      </Menu>
-      <CreateProfileDialog
-        open={dialogOpen}
-        onClose={handleDialogClose}
-        onCreate={handleCreate}
-        newName={newName}
-        setNewName={setNewName}
-      />
-    </>
-  );
-}
-
-// New component for the popup dialog
-function CreateProfileDialog({
-  open,
-  onClose,
-  onCreate,
-  newName,
-  setNewName,
-}: {
-  open: boolean;
-  onClose: () => void;
-  onCreate: () => void;
-  newName: string;
-  setNewName: (v: string) => void;
-}) {
-  return (
-    <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Create New Profile</DialogTitle>
-      <DialogContent>
-        <Stack spacing={2} sx={{ mt: 1 }}>
-          <TextField
-            autoFocus
-            label="Profile Name"
-            value={newName}
-            onChange={(e) => setNewName(e.target.value)}
-            fullWidth
-            onKeyDown={(e) => {
-              if (e.key === "Enter") onCreate();
-            }}
-          />
-        </Stack>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
-        <Button
-          onClick={onCreate}
-          variant="contained"
-          disabled={!newName.trim()}
-        >
-          Create
-        </Button>
-      </DialogActions>
-    </Dialog>
+            <TextField
+              required
+              margin="dense"
+              id="password"
+              label="Password"
+              type="password"
+              fullWidth
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClose}>Cancel</Button>
+            <Button type="submit" variant="contained">
+              Save
+            </Button>
+          </DialogActions>
+        </Box>
+      </Dialog>
+    </div>
   );
 }
