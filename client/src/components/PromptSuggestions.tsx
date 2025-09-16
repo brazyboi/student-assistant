@@ -19,7 +19,7 @@ const PromptSuggestions: React.FC<PromptSuggestionsProps> = ({ prompts, onSelect
       <button
         key={1}
         className="px-3 py-2 rounded-lg bg-gray-700 text-white text-sm hover:bg-gray-600"
-        onClick={() => onSelect({ mode: 'solution' }, 1)}
+        onClick={() => onSelect({ mode: 'answer' }, 1)}
       >
         Solution
       </button>

@@ -127,7 +127,7 @@ export default function App() {
           <ChatInput onSend={handleSend} />
         </main>
       )}
-      <ProfileButton />
+      <ProfileButton activeProfile={activeProfile}/>
     </div>
   );
 }

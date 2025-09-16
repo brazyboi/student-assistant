@@ -7,30 +7,29 @@ import DialogActions from "@mui/material/DialogActions";
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
 
-export default function ProfileDialog() {
-  const [open, setOpen] = React.useState(false);
+interface ProfileDialogProps {
+  open: boolean;
+};
+
+export default function ProfileDialog( {open}: ProfileDialogProps ) {
+  // const [open, setOpen] = React.useState(false);
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
 
-  const handleClickOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  // const handleClickOpen = () => setOpen(true);
+  // const handleClose = () => setOpen(false);
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     console.log("Form submitted:", { email, password });
     // TODO: call your createProfile() or API here
-    handleClose();
+    // handleClose();
   };
 
   return (
     <div>
-      <Button variant="outlined" onClick={handleClickOpen}>
-        Open Profile Dialog
-      </Button>
-
       <Dialog
         open={open}
-        onClose={handleClose}
         aria-labelledby="profile-dialog-title"
       >
         <DialogTitle id="profile-dialog-title">Create Profile</DialogTitle>
@@ -59,7 +58,7 @@ export default function ProfileDialog() {
             />
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleClose}>Cancel</Button>
+            {/* <Button onClick={handleClose}>Cancel</Button> */}
             <Button type="submit" variant="contained">
               Save
             </Button>
