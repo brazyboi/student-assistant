@@ -9,9 +9,10 @@ import Box from "@mui/material/Box";
 
 interface ProfileDialogProps {
   open: boolean;
+  onClose: () => void;
 };
 
-export default function ProfileDialog( {open}: ProfileDialogProps ) {
+export default function ProfileDialog( {open, onClose}: ProfileDialogProps ) {
   // const [open, setOpen] = React.useState(false);
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
@@ -23,7 +24,7 @@ export default function ProfileDialog( {open}: ProfileDialogProps ) {
     event.preventDefault();
     console.log("Form submitted:", { email, password });
     // TODO: call your createProfile() or API here
-    // handleClose();
+    onClose(); 
   };
 
   return (
@@ -58,7 +59,7 @@ export default function ProfileDialog( {open}: ProfileDialogProps ) {
             />
           </DialogContent>
           <DialogActions>
-            {/* <Button onClick={handleClose}>Cancel</Button> */}
+            <Button onClick={onClose}>Cancel</Button>
             <Button type="submit" variant="contained">
               Save
             </Button>

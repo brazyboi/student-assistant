@@ -23,6 +23,7 @@ export default function App() {
       ]
     },
   ];
+  const testProfile = { id: 1, email: 'hi@gmail.com', password: 'mehi', chats: chats } as Profile;
 
   const [activeProfile, setActiveProfile] = useState<Profile | null>(null);
   const [chatsState, setChatsState] = useState<Chat[]>(chats);

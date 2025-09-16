@@ -5,6 +5,8 @@ import PersonIcon from "@mui/icons-material/Person";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 
+import ProfileDialog from "./ProfileDialog";
+
 import type { Profile } from "../types"
 
 interface ProfileButtonProps {
@@ -13,36 +15,49 @@ interface ProfileButtonProps {
 
 export default function ProfileButton({ activeProfile }: ProfileButtonProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
   const open = Boolean(anchorEl);
 
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+  const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
 
-  const handleClose = () => {
+  const handleMenuClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleDialogOpen = () => {
+    setDialogOpen(true);
+  };
+
+  const handleDialogClose = () => {
+    setDialogOpen(false);
   };
 
   return (
     <>
       { activeProfile === null ? (
-        <Button
-          variant="contained"
-          sx={{
-            whiteSpace: "nowrap",
-            position: "fixed",
-            top: 16,
-            right: 16,
-          }}
-        >
-          Log In
-        </Button>
+        <div>
+          <Button
+            variant="contained"
+            onClick={handleDialogOpen}
+            sx={{
+              whiteSpace: "nowrap",
+              position: "fixed",
+              top: 16,
+              right: 16,
+            }}
+          >
+            Log In
+          </Button>
+          <ProfileDialog open={dialogOpen} onClose={handleDialogClose}/>
+        </div>
       ) : (
         <div>
           <IconButton
             size="large"
             aria-label="open profile"
-            onClick={handleClick}
+            onClick={handleMenuClick}
             sx={{
               color: "white",
               position: "fixed",
@@ -57,13 +72,13 @@ export default function ProfileButton({ activeProfile }: ProfileButtonProps) {
           <Menu
             anchorEl={anchorEl}
             open={open}
-            onClose={handleClose}
+            onClose={handleMenuClose}
             anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
             transformOrigin={{ vertical: "top", horizontal: "right" }}
           >
-            <MenuItem onClick={handleClose}>Profile</MenuItem>
-            <MenuItem onClick={handleClose}>Settings</MenuItem>
-            <MenuItem onClick={handleClose}>Logout</MenuItem>
+            <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
+            <MenuItem onClick={handleMenuClose}>Settings</MenuItem>
+            <MenuItem onClick={handleMenuClose}>Logout</MenuItem>
           </Menu>
         </div>
       )}
