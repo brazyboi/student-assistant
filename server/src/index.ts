@@ -53,6 +53,8 @@ app.post("/api/profiles", async (req: Request, res: Response) => {
       return res.status(400).json({ error: "Email and password are required" });
     }
 
+    console.log("IM HERE");
+
     // Hash the password before storing
     const hashedPassword = await bcrypt.hash(password, 10);
 

@@ -5,6 +5,7 @@ export async function createProfile(email: string, password: string) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password }),
   });
+  console.log("create Profile called");
   return res.json();
 }
 

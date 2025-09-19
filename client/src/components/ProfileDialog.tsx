@@ -7,6 +7,8 @@ import DialogActions from "@mui/material/DialogActions";
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
 
+import { createProfile, loginProfile } from "../api/profiles";
+
 interface ProfileDialogProps {
   open: boolean;
   onClose: () => void;
@@ -16,14 +18,26 @@ export default function ProfileDialog( {open, onClose}: ProfileDialogProps ) {
   // const [open, setOpen] = React.useState(false);
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
+  
+  const [action, setAction] = React.useState<"create" | "login" | null>(null);
 
   // const handleClickOpen = () => setOpen(true);
   // const handleClose = () => setOpen(false);
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     console.log("Form submitted:", { email, password });
-    // TODO: call your createProfile() or API here
+
+    // const formData = new FormData(event.currentTarget);
+    // console.log(formData);
+    // const action = formData.get("action");
+
+    if (action == "create") {
+      createProfile(email, password);
+    } else if (action == "login") {
+      loginProfile(email, password);
+    }
+    
     onClose(); 
   };
 
@@ -60,8 +74,11 @@ export default function ProfileDialog( {open, onClose}: ProfileDialogProps ) {
           </DialogContent>
           <DialogActions>
             <Button onClick={onClose}>Cancel</Button>
-            <Button type="submit" variant="contained">
-              Save
+            <Button type="submit" name="action" value="create" variant="contained" onClick={() => setAction("create")}>
+              Create Account
+            </Button>
+            <Button type="submit" name="action" value="login" variant="contained" onClick={() => setAction("login")}>
+              Login
             </Button>
           </DialogActions>
         </Box>
