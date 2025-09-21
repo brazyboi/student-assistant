@@ -122,7 +122,7 @@ export default function App() {
           <ChatInput onSend={handleSend} />
         </main>
       ) : (
-        <main className="flex flex-col px-48 h-full w-full">
+        <main className="flex flex-col px-100 h-full w-full">
           <ChatWindow messages={currentMessages} loading={loading}/>
           <ProblemHelpButtonGroup onHint={() => handleHelpClick({ mode: "hint"} )} onAnswer={() => handleHelpClick({ mode: "answer" })} onExplanation={() => handleHelpClick({ mode: "explanation" })}/>
           <ChatInput onSend={handleSend} />

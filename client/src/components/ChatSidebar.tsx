@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import ChatTab from "./ChatTab";
 import AddChatButton from "./AddChatButton";
 import type { Chat } from "../types";
@@ -73,7 +73,7 @@ export default function ChatSidebar({ chats, onSelectChat, selectedChatId, onAdd
             <AddChatButton onAdd={onAddChat} />
 
             <div
-                className="absolute top-0 right-0 h-full w-1 cursor-ew-resize bg-gray-600"
+                className="absolute top-0 right-0 h-full w-0.5 cursor-ew-resize bg-gray-600"
                 onMouseDown={handleMouseDown}
             />
            

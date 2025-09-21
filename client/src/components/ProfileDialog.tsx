@@ -10,31 +10,28 @@ import Box from "@mui/material/Box";
 import { createProfile, loginProfile } from "../api/profiles";
 
 interface ProfileDialogProps {
+  dialogType: 'create' | 'login';
   open: boolean;
   onClose: () => void;
 };
 
-export default function ProfileDialog( {open, onClose}: ProfileDialogProps ) {
-  // const [open, setOpen] = React.useState(false);
+const dialogTitleMap = {
+  'create': 'Create Account',
+  'login': 'Log In',
+}
+
+export default function ProfileDialog( {dialogType, open, onClose}: ProfileDialogProps ) {
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
-  
-  const [action, setAction] = React.useState<"create" | "login" | null>(null);
 
-  // const handleClickOpen = () => setOpen(true);
-  // const handleClose = () => setOpen(false);
+
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log("Form submitted:", { email, password });
 
-    // const formData = new FormData(event.currentTarget);
-    // console.log(formData);
-    // const action = formData.get("action");
-
-    if (action == "create") {
+    if (dialogType == 'create') {
       createProfile(email, password);
-    } else if (action == "login") {
+    } else if (dialogType == 'login') {
       loginProfile(email, password);
     }
     
@@ -47,7 +44,7 @@ export default function ProfileDialog( {open, onClose}: ProfileDialogProps ) {
         open={open}
         aria-labelledby="profile-dialog-title"
       >
-        <DialogTitle id="profile-dialog-title">Create Profile</DialogTitle>
+        <DialogTitle id="profile-dialog-title">{dialogTitleMap[dialogType]}</DialogTitle>
         <Box component="form" onSubmit={handleSubmit}>
           <DialogContent dividers>
             <TextField
@@ -74,11 +71,8 @@ export default function ProfileDialog( {open, onClose}: ProfileDialogProps ) {
           </DialogContent>
           <DialogActions>
             <Button onClick={onClose}>Cancel</Button>
-            <Button type="submit" name="action" value="create" variant="contained" onClick={() => setAction("create")}>
+            <Button type="submit" name="action" value="create" variant="contained">
               Create Account
-            </Button>
-            <Button type="submit" name="action" value="login" variant="contained" onClick={() => setAction("login")}>
-              Login
             </Button>
           </DialogActions>
         </Box>

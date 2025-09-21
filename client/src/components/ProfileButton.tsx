@@ -15,7 +15,7 @@ interface ProfileButtonProps {
 
 export default function ProfileButton({ activeProfile }: ProfileButtonProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [whichDialogOpen, setDialogOpen] = useState<"login" | "create" | null>(null);
   const open = Boolean(anchorEl);
 
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -26,31 +26,43 @@ export default function ProfileButton({ activeProfile }: ProfileButtonProps) {
     setAnchorEl(null);
   };
 
-  const handleDialogOpen = () => {
-    setDialogOpen(true);
+  const handleDialogOpen = (type: "login" | "create") => {
+    setDialogOpen(type);
   };
 
   const handleDialogClose = () => {
-    setDialogOpen(false);
+    setDialogOpen(null);
   };
 
   return (
     <>
       { activeProfile === null ? (
-        <div>
+        <div className="fixed top-4 right-4">
           <Button
             variant="contained"
-            onClick={handleDialogOpen}
+            onClick={() => handleDialogOpen('create')}
+            color="secondary"
+            size="small"
             sx={{
               whiteSpace: "nowrap",
-              position: "fixed",
-              top: 16,
-              right: 16,
+              marginX: '0.5rem',
+            }}
+          >
+            Create Account
+          </Button>
+          <Button
+            variant="contained"
+            onClick={() => handleDialogOpen('login')}
+            size="small"
+            sx={{
+              whiteSpace: "nowrap",
             }}
           >
             Log In
           </Button>
-          <ProfileDialog open={dialogOpen} onClose={handleDialogClose}/>
+          
+          <ProfileDialog dialogType='login' open={whichDialogOpen === 'login'} onClose={handleDialogClose}/>
+          <ProfileDialog dialogType='create' open={whichDialogOpen === 'create'} onClose={handleDialogClose}/>
         </div>
       ) : (
         <div>
