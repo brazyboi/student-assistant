@@ -17,13 +17,14 @@ import type { Chat, QueryMode, Profile } from "./types";
 export default function App() {
   const chats: Chat[] = [
     { 
-      id: 1, 
+      id: 5050,
+      profile_id: 1, 
       title: "Current Chat", 
       messages: [ 
       ]
     },
   ];
-  const testProfile = { id: 1, email: 'hi@gmail.com', password: 'mehi', chats: chats } as Profile;
+  // const testProfile = { id: 1, email: 'hi@gmail.com'} as Profile;
 
   const [activeProfile, setActiveProfile] = useState<Profile | null>(null);
   const [chatsState, setChatsState] = useState<Chat[]>(chats);
@@ -102,7 +103,8 @@ export default function App() {
   function handleAddChat() {
     setChatsState((prevChats) => {
       const newId = prevChats.length > 0 ? Math.max(...prevChats.map(c => c.id)) + 1 : 1;
-      const newChat = { id: newId, title: `Chat ${newId}`, messages: [] };
+      if (!activeProfile) return prevChats;
+      const newChat : Chat = { id: newId, profile_id: activeProfile.id, title: `Chat ${newId}`, messages: [] };
       setSelectedChatId(newId);
       return [...prevChats, newChat];
     });
@@ -128,7 +130,7 @@ export default function App() {
           <ChatInput onSend={handleSend} />
         </main>
       )}
-      <ProfileButton activeProfile={activeProfile}/>
+      <ProfileButton activeProfile={activeProfile} setActiveProfile={(profile: any) => setActiveProfile(profile)}/>
     </div>
   );
 }

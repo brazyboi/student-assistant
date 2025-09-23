@@ -11,9 +11,10 @@ import type { Profile } from "../types"
 
 interface ProfileButtonProps {
   activeProfile: Profile | null;
+  setActiveProfile: (profile: any) => void;
 };
 
-export default function ProfileButton({ activeProfile }: ProfileButtonProps) {
+export default function ProfileButton({ activeProfile, setActiveProfile }: ProfileButtonProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [whichDialogOpen, setDialogOpen] = useState<"login" | "create" | null>(null);
   const open = Boolean(anchorEl);
@@ -21,15 +22,19 @@ export default function ProfileButton({ activeProfile }: ProfileButtonProps) {
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
-
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
 
+  const handleLogout = () => {
+    setActiveProfile(null);
+    setAnchorEl(null);
+  };
+
+
   const handleDialogOpen = (type: "login" | "create") => {
     setDialogOpen(type);
   };
-
   const handleDialogClose = () => {
     setDialogOpen(null);
   };
@@ -61,8 +66,8 @@ export default function ProfileButton({ activeProfile }: ProfileButtonProps) {
             Log In
           </Button>
           
-          <ProfileDialog dialogType='login' open={whichDialogOpen === 'login'} onClose={handleDialogClose}/>
-          <ProfileDialog dialogType='create' open={whichDialogOpen === 'create'} onClose={handleDialogClose}/>
+          <ProfileDialog dialogType='login' open={whichDialogOpen === 'login'} onClose={handleDialogClose} onLoginSuccess={setActiveProfile}/>
+          <ProfileDialog dialogType='create' open={whichDialogOpen === 'create'} onClose={handleDialogClose} onLoginSuccess={setActiveProfile}/>
         </div>
       ) : (
         <div>
@@ -90,7 +95,7 @@ export default function ProfileButton({ activeProfile }: ProfileButtonProps) {
           >
             <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
             <MenuItem onClick={handleMenuClose}>Settings</MenuItem>
-            <MenuItem onClick={handleMenuClose}>Logout</MenuItem>
+            <MenuItem onClick={handleLogout}>Logout</MenuItem>
           </Menu>
         </div>
       )}

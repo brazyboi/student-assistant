@@ -8,11 +8,13 @@ import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
 
 import { createProfile, loginProfile } from "../api/profiles";
+import type { Profile } from "../types";
 
 interface ProfileDialogProps {
   dialogType: 'create' | 'login';
   open: boolean;
   onClose: () => void;
+  onLoginSuccess: (profile: Profile) => void;
 };
 
 const dialogTitleMap = {
@@ -20,20 +22,24 @@ const dialogTitleMap = {
   'login': 'Log In',
 }
 
-export default function ProfileDialog( {dialogType, open, onClose}: ProfileDialogProps ) {
+export default function ProfileDialog( {dialogType, open, onClose, onLoginSuccess}: ProfileDialogProps ) {
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
 
-
-
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    let response = null;
 
     if (dialogType == 'create') {
-      createProfile(email, password);
+      response = createProfile(email, password);
     } else if (dialogType == 'login') {
-      loginProfile(email, password);
+      response = loginProfile(email, password);
     }
+
+    response?.then((data) => {
+      console.log("ProfileDialog response data:", data);
+      onLoginSuccess(data as Profile);
+    });
     
     onClose(); 
   };
@@ -72,7 +78,7 @@ export default function ProfileDialog( {dialogType, open, onClose}: ProfileDialo
           <DialogActions>
             <Button onClick={onClose}>Cancel</Button>
             <Button type="submit" name="action" value="create" variant="contained">
-              Create Account
+              {dialogTitleMap[dialogType]}
             </Button>
           </DialogActions>
         </Box>

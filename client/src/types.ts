@@ -1,8 +1,6 @@
 export interface Profile {
   id: number;
   email: string;
-  password: string;
-  chats: Chat[];
 }
 
 export interface Message { 
@@ -12,6 +10,7 @@ export interface Message {
 
 export interface Chat {
   id: number;
+  profile_id: number;
   title: string;
   messages: Message[];
 }

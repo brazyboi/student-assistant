@@ -15,6 +15,10 @@ export async function loginProfile(email: string, password: string) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password }),
   });
+  console.log("login Profile called");
+  if (!res.ok) {
+    throw new Error(`Login failed: ${res.status}`);
+  }
   return res.json();
 }
 
