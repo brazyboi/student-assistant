@@ -13,7 +13,6 @@ interface SidebarProps {
 export default function ChatSidebar({ chats, onSelectChat, selectedChatId, onAddChat } : SidebarProps) {
     const [sidebarWidth, setSidebarWidth] = useState(500);
     const [isDragging, setDragging] = useState(false);
-    // const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
 
     const [startX, setStartX] = useState(0);
     const [startWidth, setStartWidth] = useState(0);
@@ -23,16 +22,6 @@ export default function ChatSidebar({ chats, onSelectChat, selectedChatId, onAdd
         setStartX(e.clientX);
         setStartWidth(sidebarWidth);
         e.preventDefault();
-    };
-
-    const handleMouseMove = (e: React.MouseEvent) => {
-        if (!isDragging) return;
-        const deltaX = e.clientX - startX;
-        setSidebarWidth(Math.max(150, startWidth + deltaX));
-    };
-
-    const handleMouseUp = () => {
-        setDragging(false);
     };
 
     useEffect(() => {
