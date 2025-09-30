@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button } from '@mui/material';
+import { Button, TextField } from '@mui/material';
 
 import SendIcon from '@mui/icons-material/Send';
 
@@ -23,24 +23,34 @@ export default function ChatInput({
         onSubmit={handleSubmit} 
         className="gap-2 bottom-0 left-0 right-0 mb-8 mt-4 flex justify-center w-full"
         >
-            <input
-                className="border rounded-3xl p-4 w-full"
+            <TextField
+                variant="outlined"
+                autoComplete='off'
+                className="w-full"
                 autoFocus
-                type="text"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                placeholder='Enter your message...'
+                placeholder='Enter problem...'
+                multiline
+                rows={5}
+                maxRows={10}
+                sx={{
+                    '& .MuiOutlinedInput-root': {
+                        '& fieldset': {
+                            borderWidth: 2,
+                            borderColor: 'gray'
+                        }
+
+                    }
+                }}
             />
-            {/* <button
-                type='submit'
-                className='px-4 py-2 bg-blue-500 text-white rounded-3xl hover:bg-blue-600'
-            >
-                Send
-            </button> */}
             <Button 
                 variant="contained" 
                 type="submit"
-                sx = {{ borderRadius: '24px' }}
+                size='large'
+                sx = {{ 
+                    alignSelf: 'flex-start',
+                }}
             >
                 <SendIcon />
             </Button>

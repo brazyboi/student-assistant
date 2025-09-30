@@ -60,15 +60,6 @@ interface AddChatButtonProps {
 }
 
 const AddChatButton: React.FC<AddChatButtonProps> = ({ onAdd }) => {
-  const [dialogOpen, setDialogOpen] = React.useState<boolean>(false);
-
-  const openDialog = () => {
-    setDialogOpen(true);
-  };
-  const closeDialog = () => {
-    setDialogOpen(false);
-  }
-
   return (
     <React.Fragment>
       <Button
@@ -79,11 +70,10 @@ const AddChatButton: React.FC<AddChatButtonProps> = ({ onAdd }) => {
           mb: 1, 
           width: '100%',
         }}
-        onClick={openDialog}
+        onClick={onAdd}
       >
         + New Chat
       </Button>
-      <EnterProblemDialog open={dialogOpen} onClose={closeDialog} onSubmit={onAdd}/>
     </React.Fragment>
   );
 };

@@ -3,7 +3,6 @@ import { useState } from "react";
 // Components
 import ChatInput from "./components/ChatInput";
 import ChatWindow from "./components/ChatWindow";
-import ProfileSelector from "./components/ProfileDialog";
 import ProfileButton from "./components/ProfileButton"
 import ChatSidebar from "./components/ChatSidebar";
 import ProblemHelpButtonGroup from "./components/ProblemHelpButton";
@@ -13,6 +12,14 @@ import { sendMessage } from "./api/chat";
 
 // Types
 import type { Chat, QueryMode, Profile } from "./types";
+
+import { createTheme, CssBaseline, ThemeProvider } from "@mui/material";
+
+const darkTheme = createTheme({
+  palette: {
+    mode: 'dark',
+  },
+});
 
 export default function App() {
   const chats: Chat[] = [
@@ -111,26 +118,29 @@ export default function App() {
   }
 
   return (
-    <div className="flex h-screen">
-      <ChatSidebar 
-        chats={chatsState} 
-        onSelectChat={setSelectedChatId} 
-        selectedChatId={selectedChatId}
-        onAddChat={handleAddChat}
-      />
-      {currentMessages.length === 0 ? (
-        <main className="flex flex-col h-full w-full px-60 items-center justify-center">
-          <h1>Student Assistant</h1>
-          <ChatInput onSend={handleSend} />
-        </main>
-      ) : (
-        <main className="flex flex-col px-60 h-full w-full">
-          <ChatWindow messages={currentMessages} loading={loading}/>
-          <ProblemHelpButtonGroup onHint={() => handleHelpClick({ mode: "hint"} )} onAnswer={() => handleHelpClick({ mode: "answer" })} onExplanation={() => handleHelpClick({ mode: "explanation" })}/>
-          <ChatInput onSend={handleSend} />
-        </main>
-      )}
-      <ProfileButton activeProfile={activeProfile} setActiveProfile={(profile: any) => setActiveProfile(profile)}/>
-    </div>
+    <ThemeProvider theme={darkTheme}>
+      <CssBaseline/>
+      <div className="flex h-screen">
+        <ChatSidebar 
+          chats={chatsState} 
+          onSelectChat={setSelectedChatId} 
+          selectedChatId={selectedChatId}
+          onAddChat={handleAddChat}
+        />
+        {currentMessages.length === 0 ? (
+          <main className="flex flex-col h-full w-full px-80 items-center justify-center">
+            <h1>Student Assistant</h1>
+            <ChatInput onSend={handleSend} />
+          </main>
+        ) : (
+          <main className="flex flex-col px-80 h-full w-full">
+            <ChatWindow messages={currentMessages} loading={loading}/>
+            <ProblemHelpButtonGroup onHint={() => handleHelpClick({ mode: "hint"} )} onAnswer={() => handleHelpClick({ mode: "answer" })} onExplanation={() => handleHelpClick({ mode: "explanation" })}/>
+            <ChatInput onSend={handleSend} />
+          </main>
+        )}
+        <ProfileButton activeProfile={activeProfile} setActiveProfile={(profile: any) => setActiveProfile(profile)}/>
+      </div>
+    </ThemeProvider>
   );
 }
