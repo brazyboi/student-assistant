@@ -1,4 +1,5 @@
-import Button from '@mui/material/Button';
+import { Button } from '@/components/ui/button';
+import { cn } from "@/lib/utils"
 
 interface ChatTabProps {
   title: string;
@@ -9,17 +10,12 @@ interface ChatTabProps {
 const ChatItem = ({ title, selected, onClick }: ChatTabProps) => {
   return (
     <Button
-      fullWidth
-      variant={selected ? "contained" : "text"}
+      className={cn(
+        "w-full justify-start text-lg normal-case mb-1", // base styles
+        selected ? "font-bold" : "font-normal"
+      )}
       color={selected ? "primary" : "inherit"}
       onClick={onClick}
-      sx={{
-        justifyContent: "flex-start",
-        fontWeight: selected ? "bold" : "normal",
-        textTransform: "none",
-        fontSize: '1.2rem',
-        mb: 1,
-      }}
     >
       {title}
     </Button>

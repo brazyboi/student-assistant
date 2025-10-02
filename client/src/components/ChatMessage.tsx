@@ -1,4 +1,8 @@
 import ReactMarkdown from "react-markdown";
+import { 
+  Card  
+} from '@/components/ui/card';
+import { cn } from "@/lib/utils";
 
 type MessageProps = {
     text: string;
@@ -12,13 +16,17 @@ export default function ChatMessage({text, sender} : MessageProps) {
     <div
       className={`flex ${isUser ? "justify-end" : "justify-start"} my-2 mx-2`}
     >
-      <div
-        className={`max-w-l px-4 py-2 rounded-xl
-          ${isUser ? "bg-blue-500 text-white" : "bg-gray-200 text-black"}`}
-      >
+      <Card
+        className={cn(
+          "max-w-lg px-4 py-2 rounded-xl border-2 border-secondary",
+          sender === "user"
+            ? "bg-secondary/50"
+            : ""
+        )}
+      > 
         {/* {text} */}
         <ReactMarkdown>{text}</ReactMarkdown>
-      </div>
+      </Card>
     </div>
   );
 }; 

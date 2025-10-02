@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { Button, TextField } from '@mui/material';
-
-import SendIcon from '@mui/icons-material/Send';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea'
 
 export default function ChatInput({
     onSend,
@@ -23,36 +22,21 @@ export default function ChatInput({
         onSubmit={handleSubmit} 
         className="gap-2 bottom-0 left-0 right-0 mb-8 mt-4 flex justify-center w-full"
         >
-            <TextField
-                variant="outlined"
+            <Textarea
                 autoComplete='off'
-                className="w-full"
+                className="w-full border-2 border-secondary"
                 autoFocus
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder='Enter problem...'
-                multiline
-                rows={5}
-                maxRows={10}
-                sx={{
-                    '& .MuiOutlinedInput-root': {
-                        '& fieldset': {
-                            borderWidth: 2,
-                            borderColor: 'gray'
-                        }
-
-                    }
-                }}
+                // rows={5}
             />
             <Button 
-                variant="contained" 
-                type="submit"
-                size='large'
-                sx = {{ 
-                    alignSelf: 'flex-start',
-                }}
+                type='submit'
+                size='lg'
+                className='self-start'
             >
-                <SendIcon />
+                Send
             </Button>
         </form>
     )

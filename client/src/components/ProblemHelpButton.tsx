@@ -1,4 +1,4 @@
-import { Button, Stack } from "@mui/material";
+import { Button } from "@/components/ui/button"
 
 type ProblemHelpButtonProps = {
     type: 'hint' | 'answer' | 'explanation';
@@ -22,17 +22,8 @@ export function ProblemHelpButton({ type, onClick }: ProblemHelpButtonProps) {
     return (
         <Button
             onClick={onClick}
-            variant="contained"
             color={buttonColor}
-            size="small"
-            sx={{
-                borderRadius: '24px',
-                minWidth: 0,
-                px: 2,
-                py: 0.5,
-                fontSize: "0.95rem",
-                textTransform: "none"
-            }}
+            size="sm"
         >
             {label}
         </Button>
@@ -50,10 +41,10 @@ export default function ProblemHelpButtonGroup({
     onExplanation: () => void;
 }) {
     return (
-        <Stack direction="row" spacing={1}>
+        <div className="flex flex-row gap-2">
             <ProblemHelpButton type="hint" onClick={onHint} />
             <ProblemHelpButton type="answer" onClick={onAnswer} />
             <ProblemHelpButton type="explanation" onClick={onExplanation} />
-        </Stack>
+        </div>
     );
 }
