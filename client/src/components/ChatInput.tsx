@@ -1,13 +1,18 @@
-import { useState } from 'react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea'
+import { Send } from 'lucide-react';
 
-export default function ChatInput({
-    onSend,
-}: {
-    onSend: (message: string) => void;
-}) {
-    const [message, setMessage] = useState('');
+export default function ChatInput({ onSend }: { onSend: (message: string) => void; }) {
+    const [message, setMessage] = React.useState('');
+    const textareaRef = React.useRef<HTMLTextAreaElement>(null);
+
+    const handleInput = () => {
+        const el = textareaRef.current
+        if (!el) return
+        el.style.height = "auto"
+        el.style.height = `${el.scrollHeight}px`
+    }
 
     function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
@@ -19,24 +24,26 @@ export default function ChatInput({
 
     return (
         <form 
-        onSubmit={handleSubmit} 
-        className="gap-2 bottom-0 left-0 right-0 mb-8 mt-4 flex justify-center w-full"
+            onSubmit={handleSubmit} 
+            className="relative mt-2 justify-center w-full"
         >
             <Textarea
-                autoComplete='off'
-                className="w-full border-2 border-secondary"
-                autoFocus
+                ref={textareaRef}
+                rows={1}
+                onInput={handleInput}
+                placeholder='Enter problem...'
+                className="resize-none overflow-hidden break-words whitespace-pre-wrap break-all pr-12 border-2 border-secondary"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                placeholder='Enter problem...'
-                // rows={5}
+                autoComplete='off'
+                autoFocus
             />
             <Button 
                 type='submit'
-                size='lg'
-                className='self-start'
+                size='icon'
+                className='absolute rounded-full bottom-2 right-2 h-8 w-8'
             >
-                Send
+                <Send className="self-center"/>
             </Button>
         </form>
     )

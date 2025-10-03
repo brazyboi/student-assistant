@@ -47,7 +47,7 @@ export default function ChatSidebar({ chats, onSelectChat, selectedChatId, onAdd
             className="flex flex-col w-1/3 relative p-2"
             style={{ width: sidebarWidth }}
         >
-            {/* <h2 className="text-center text-5xl mt-5 py-5 mb-2">Chats</h2> */}
+            <h2 className="text-center text-2xl py-3 mb-2">Problems</h2>
             <div className="flex-1">
                 {chats.map((chat) => (
                     <ChatTab 

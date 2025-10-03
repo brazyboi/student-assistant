@@ -66,11 +66,11 @@ export default function ProfileDialog( {dialogType, onLoginSuccess}: ProfileDial
           <DialogDescription>Please enter your email and password.</DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className='grid gap-3'>
           <Label htmlFor="email">Email</Label>
-          <Input type="email" placeholder="m@example.com" onChange={(e) => setEmail(e.target.value)}/>
+          <Input type="email" placeholder="m@example.com" onChange={(e) => setEmail(e.target.value)} required />
           <Label htmlFor="password">Password</Label>
-          <Input type="password" onChange={(e) => setPassword(e.target.value)}/>
+          <Input type="password" onChange={(e) => setPassword(e.target.value)} required />
           <DialogFooter>
             <DialogClose asChild>
               <Button variant='outline'>Cancel</Button>
