@@ -14,14 +14,9 @@ import {
   DialogClose,
 } from '@/components/ui/dialog';
 
-// import Dialog from "@mui/material/Dialog";
-// import DialogTitle from "@mui/material/DialogTitle";
-// import DialogContent from "@mui/material/DialogContent";
-// import DialogActions from "@mui/material/DialogActions";
-// import TextField from "@mui/material/TextField";
-// import Box from "@mui/material/Box";
 
-import { createProfile, loginProfile } from "../api/profiles";
+// import { createProfile, loginProfile } from "../api/profiles";
+import { supabase } from "../api/supabaseClient";
 import type { Profile } from "../types";
 
 interface ProfileDialogProps {
@@ -38,12 +33,36 @@ export default function ProfileDialog( {dialogType, onLoginSuccess}: ProfileDial
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    console.log("I'm here");
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    let response = null;
 
-    if (dialogType == 'create') {
+    try {
+      let data: any = null;
+      let error: any = null;
+
+      if (dialogType == 'create') {
+        ({ data, error } = await supabase.auth.signUp({ email, password }));
+      } else if (dialogType == 'login') {
+        ({ data, error } = await supabase.auth.signInWithPassword({ email, password }));
+      }
+
+      if (error) {
+        console.error("Supabase auth error:", error.message)
+        return;
+      }
+      console.log("Profile signup/signin data", data);
+
+      if (data?.user) {
+        onLoginSuccess({ id: data.user.id, email: data.user.email } as Profile);
+      }
+      
+    } catch (err) {
+      console.error('Unexpected error');
+    }
+
+    
+
+    /*if (dialogType == 'create') {
       response = createProfile(email, password);
     } else if (dialogType == 'login') {
       response = loginProfile(email, password);
@@ -52,7 +71,7 @@ export default function ProfileDialog( {dialogType, onLoginSuccess}: ProfileDial
     response?.then((data) => {
       console.log("ProfileDialog response data:", data);
       onLoginSuccess(data as Profile);
-    });
+    });*/
   };
 
   return (

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { 
@@ -8,6 +7,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import ProfileDialog from "./ProfileDialog";
+import { supabase } from "@/api/supabaseClient";
 
 import type { Profile } from "../types"
 import { DropdownMenuContent } from "@radix-ui/react-dropdown-menu";
@@ -18,7 +18,12 @@ interface ProfileManagerProps {
 };
 
 export default function ProfileManager({ activeProfile, setActiveProfile }: ProfileManagerProps) {
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error("Supabase signout error: ", error)
+    }
+    console.log("I signed out");
     setActiveProfile(null);
   };
 
