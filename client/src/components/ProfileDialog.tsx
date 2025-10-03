@@ -39,6 +39,7 @@ export default function ProfileDialog( {dialogType, onLoginSuccess}: ProfileDial
   const [password, setPassword] = React.useState("");
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    console.log("I'm here");
     event.preventDefault();
     let response = null;
 
@@ -56,15 +57,16 @@ export default function ProfileDialog( {dialogType, onLoginSuccess}: ProfileDial
 
   return (
     <Dialog>
-      <form onSubmit={handleSubmit}>
-        <DialogTrigger asChild>
-          <Button size='sm' className="whitespace-nowrap px-4 mx-1">{dialogTitleMap[dialogType]}</Button> 
-        </DialogTrigger>
-        <DialogContent>          
-          <DialogHeader>
-            <DialogTitle>{dialogTitleMap[dialogType]}</DialogTitle>
-            <DialogDescription>Please enter your email and password.</DialogDescription>
-          </DialogHeader>
+      <DialogTrigger asChild>
+        <Button size='sm' className="whitespace-nowrap px-4 mx-1">{dialogTitleMap[dialogType]}</Button> 
+      </DialogTrigger>
+      <DialogContent>          
+        <DialogHeader>
+          <DialogTitle>{dialogTitleMap[dialogType]}</DialogTitle>
+          <DialogDescription>Please enter your email and password.</DialogDescription>
+        </DialogHeader>
+
+        <form onSubmit={handleSubmit}>
           <Label htmlFor="email">Email</Label>
           <Input type="email" placeholder="m@example.com" onChange={(e) => setEmail(e.target.value)}/>
           <Label htmlFor="password">Password</Label>
@@ -73,10 +75,11 @@ export default function ProfileDialog( {dialogType, onLoginSuccess}: ProfileDial
             <DialogClose asChild>
               <Button variant='outline'>Cancel</Button>
             </DialogClose>
-            <Button type="submit">Submit</Button>
-          </DialogFooter>
-        </DialogContent>
-      </form>
+            <Button type="submit" onClick={(e) => console.log("Clicked submit")}>Submit</Button>
+          </DialogFooter> 
+        </form>
+
+      </DialogContent>
     </Dialog>
   );
 }

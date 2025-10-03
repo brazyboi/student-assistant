@@ -3,7 +3,7 @@ import { useState } from "react";
 // Components
 import ChatInput from "./components/ChatInput";
 import ChatWindow from "./components/ChatWindow";
-import ProfileButton from "./components/ProfileManager"
+import ProfileManager from "./components/ProfileManager"
 import ChatSidebar from "./components/ChatSidebar";
 import ProblemHelpButtonGroup from "./components/ProblemHelpButton";
 
@@ -119,18 +119,18 @@ export default function App() {
         onAddChat={handleAddChat}
       />
       {currentMessages.length === 0 ? (
-        <main className="flex flex-col h-full w-full px-80 items-center justify-center">
+        <main className="flex flex-col h-full w-full px-[10vw] items-center justify-center">
           {/* <h1>Student Assistant</h1> */}
           <ChatInput onSend={handleSend} />
         </main>
       ) : (
-        <main className="flex flex-col px-80 h-full w-full">
+        <main className="flex flex-col px-[10vw] h-full w-full">
           <ChatWindow messages={currentMessages} loading={loading}/>
           <ProblemHelpButtonGroup onHint={() => handleHelpClick({ mode: "hint"} )} onAnswer={() => handleHelpClick({ mode: "answer" })} onExplanation={() => handleHelpClick({ mode: "explanation" })}/>
           <ChatInput onSend={handleSend} />
         </main>
       )}
-      <ProfileButton activeProfile={activeProfile} setActiveProfile={(profile: any) => setActiveProfile(profile)}/>
+      <ProfileManager activeProfile={activeProfile} setActiveProfile={(profile: any) => setActiveProfile(profile)}/>
     </div>
   );
 }

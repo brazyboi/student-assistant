@@ -12,12 +12,12 @@ import ProfileDialog from "./ProfileDialog";
 import type { Profile } from "../types"
 import { DropdownMenuContent } from "@radix-ui/react-dropdown-menu";
 
-interface ProfileButtonProps {
+interface ProfileManagerProps {
   activeProfile: Profile | null;
   setActiveProfile: (profile: any) => void;
 };
 
-export default function ProfileButton({ activeProfile, setActiveProfile }: ProfileButtonProps) {
+export default function ProfileManager({ activeProfile, setActiveProfile }: ProfileManagerProps) {
   const handleLogout = () => {
     setActiveProfile(null);
   };
