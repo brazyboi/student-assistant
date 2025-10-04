@@ -1,5 +1,13 @@
 import type {Chat, QueryMode} from "../types";
 
+// export async function retrieveSessions (
+
+// ) {
+//   fetch('/api/sessions', {
+//     headers: { 'Authorization', `Bearer ${supabaseAuthToken}`}
+//   })
+// }
+
 export async function sendMessage(
   chat: Chat, 
   userMessage: string | null,
