@@ -34,7 +34,6 @@ export const contract = c.router({
         responses: {
             200: z.object({
                 attempt_id: z.number(),
-                session_id: z.number(),
                 user_attempt: z.string(),
                 ai_feedback: z.string(),
                 is_correct: z.boolean(),
