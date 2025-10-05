@@ -9,46 +9,102 @@ import ProblemHelpButtonGroup from "./components/ProblemHelpButton";
 
 // Backend
 // import { sendMessage } from "./api/chat";
-import { startSession } from "./api/chat";
+import { startSession, addAttempt as apiAddAttempt } from "./api/chat";
 
 // Types
 import type { Chat, QueryMode, Profile } from "./types";
 
 export default function App() {
-  const chats: Chat[] = [
-    { 
-      id: 5050,
-      profile_id: 1, 
-      title: "Current Chat", 
-      messages: [ 
-      ]
-    },
-  ];
+  // const chats: Chat[] = [
+  //   { 
+  //     id: 5050,
+  //     profile_id: 1, 
+  //     title: "Current Chat", 
+  //     messages: [ 
+  //     ]
+  //   },
+  // ];
   // const testProfile = { id: 1, email: 'hi@gmail.com'} as Profile;
 
   const [activeProfile, setActiveProfile] = useState<Profile | null>(null);
-  const [chatsState, setChatsState] = useState<Chat[]>(chats);
-  const [selectedChatId, setSelectedChatId] = useState<number | null>( chats[0].id );
+  const [chatsState, setChatsState] = useState<Chat[]>([]);
+  const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
 
   const currentMessages = chatsState.find((chat) => chat.id === selectedChatId)?.messages ?? [];
 
   const [loading, setLoading] = useState(false);
 
   async function handleStartSession(problem: string) {
-    const selectedChat = chatsState.find((c) => c.id === selectedChatId); 
-    if (!selectedChat) return;
+    if (!activeProfile) {
+      console.error("No active profile — cannot start session");
+      return;
+    }
 
+    setLoading(true);
+    try {
+      // Use a default topic for now; can be enhanced to prompt user for topic
+      const topic = "General";
+      const result = await startSession(topic, problem);
+      if (!result?.id) {
+        console.error("Failed to create session", result);
+        return;
+      }
+
+      const sessionId = result.id;
+
+      // Create a new chat representing this session
+      const newChat: Chat = {
+        id: sessionId,
+        profile_id: activeProfile.id,
+        title: (problem.length > 40 ? problem.slice(0, 37) + "..." : problem) || `Session ${sessionId}`,
+        messages: [{ sender: "user", text: problem }],
+      };
+
+      setChatsState((prev) => [...prev, newChat]);
+      setSelectedChatId(sessionId);
+    } catch (err) {
+      console.error("startSession error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  async function handleAddAttempt(user_attempt: string) {
+
+    const sessionId = selectedChatId;
+    if (!sessionId) {
+      console.error("No session selected to add attempt to");
+      return;
+    }
+
+    // Optimistically add the user's attempt to UI
     setChatsState((prevChats) =>
       prevChats.map((chat) =>
-        chat.id === selectedChatId
-          ? {
-              ...chat,
-              messages: [...chat.messages, { sender: "user", text: problem }],
-            }
+        chat.id === sessionId
+          ? { ...chat, messages: [...chat.messages, { sender: "user", text: user_attempt }] }
           : chat
       )
-    ); 
-  };
+    );
+
+    try {
+      const result = await apiAddAttempt(sessionId, user_attempt);
+      if (result) {
+        const aiFeedback = (result as any).ai_feedback ?? "";
+        // Append AI feedback message
+        setChatsState((prevChats) =>
+          prevChats.map((chat) =>
+            chat.id === sessionId
+              ? { ...chat, messages: [...chat.messages, { sender: "ai", text: aiFeedback }] }
+              : chat
+          )
+        );
+      } else {
+        console.error("addAttempt returned no result");
+      }
+    } catch (err) {
+      console.error("addAttempt error:", err);
+    }
+  }
 
   // async function handleSend(userText: string) {
   //   const selectedChat = chatsState.find((c) => c.id === selectedChatId);
@@ -135,7 +191,7 @@ export default function App() {
         selectedChatId={selectedChatId}
         onAddChat={handleAddChat}
       />
-      {currentMessages.length === 0 ? (
+      {!selectedChatId || currentMessages.length === 0 ? (
         <main className="flex flex-col h-full w-full px-[20vw] items-center justify-center">
           <h1>Student Assistant</h1>
           <ChatInput onSend={handleStartSession} />
@@ -144,7 +200,7 @@ export default function App() {
         <main className="flex flex-col px-[20vw] h-full w-full">
           <ChatWindow messages={currentMessages} loading={loading}/>
           {/* <ProblemHelpButtonGroup onHint={() => handleHelpClick({ mode: "hint"} )} onAnswer={() => handleHelpClick({ mode: "answer" })} onExplanation={() => handleHelpClick({ mode: "explanation" })}/> */}
-          <ChatInput onSend={handleStartSession} />
+          <ChatInput onSend={handleAddAttempt} />
         </main>
       )}
       <ProfileManager activeProfile={activeProfile} setActiveProfile={(profile: any) => setActiveProfile(profile)}/>

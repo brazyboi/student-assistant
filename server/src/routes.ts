@@ -25,7 +25,7 @@ export const router = s.router(contract, {
         const user_id = await getUserIdFromToken(headers.authorization);
         const session_id = parseInt(params.session_id);
         const session_res = await pool.query(
-            `SELECT problem FROM study_sessions WHERE id = $1`,
+            `SELECT user_id, problem FROM study_sessions WHERE id = $1`,
             [session_id]
         );
 

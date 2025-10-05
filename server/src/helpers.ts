@@ -1,5 +1,8 @@
 import { createClient } from "@supabase/supabase-js";
 import OpenAI from "openai";
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const supabase = createClient(
   process.env.SUPABASE_URL!,
@@ -29,15 +32,21 @@ Student Assistant: ${user_attempt}
 Give concise, constructive feedback. 
     `;
 
-    const ai_response = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [
-            {
-                role: "user",
-                content: prompt
-            }
-        ]
-    });
+    try {
+        const ai_response = await openai.chat.completions.create({
+            model: "gpt-4o-mini",
+            messages: [
+                {
+                    role: "user",
+                    content: prompt
+                }
+            ]
+        });
 
-    return ai_response.choices[0]?.message?.content ?? "No feedback generated..."
+        return ai_response.choices[0]?.message?.content ?? "No feedback generated..."
+    } catch (err: any) {
+        console.error("Error generating AI feedback", err.message || err);
+        return "AI feedback could not be generated at this time.";
+    }
+
 }

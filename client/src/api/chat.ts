@@ -43,6 +43,8 @@ export async function addAttempt(session_id: number, user_attempt: string) {
       extraHeaders: { Authorization: `Bearer ${token}` },
     });
 
+    console.log(token);
+
     if (result.status === 200) {
       console.log("Attempt saved:", result.body);
       return result.body; // attempt_id, ai_feedback, etc.
