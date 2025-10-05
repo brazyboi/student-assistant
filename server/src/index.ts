@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 import router from './routes.ts';
 import pool from './db.ts';
 import { createExpressEndpoints } from '@ts-rest/express';
-import { contract } from 'shared/contracts.ts';
+import { contract } from '@student-assistant/shared';
 
 dotenv.config();
 

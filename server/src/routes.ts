@@ -1,6 +1,6 @@
-import { contract } from "shared/contracts";
-import pool from "./db";
-import { getAIFeedback, getUserIdFromToken } from "./helpers";
+import { contract } from "@student-assistant/shared";
+import pool from "./db.ts";
+import { getAIFeedback, getUserIdFromToken } from "./helpers.ts";
 import { initServer } from "@ts-rest/express";
 
 const s = initServer();
