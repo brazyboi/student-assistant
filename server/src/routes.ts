@@ -6,6 +6,55 @@ import { initServer } from "@ts-rest/express";
 const s = initServer();
 
 export const router = s.router(contract, {
+    // GET requests
+    getStudySessions: async ({ headers }) => {
+        const user_id = await getUserIdFromToken(headers.authorization);
+
+        const result = await pool.query(
+            `SELECT id, topic, problem, created_at
+            FROM study_sessions
+            WHERE user_id = $1
+            ORDER BY created_at DESC`,
+            [user_id]
+        );
+
+        return {
+            status: 200,
+            body: result.rows
+        }
+    },
+    getAttempts: async ({ params, headers }) => {
+        const user_id = await getUserIdFromToken(headers.authorization); 
+        const session_id = parseInt(params.session_id);
+
+        const session_res = await pool.query(
+            `SELECT user_id FROM study_sessions WHERE id = $1`,
+            [session_id]
+        );
+
+        if (session_res.rows.length === 0) {
+            throw new Error("Session not found.")
+        };
+
+        if (session_res.rows[0].user_id !== user_id) {
+            throw new Error("Incorrect user to session pair.");
+        }
+
+        const result = await pool.query(
+            `SELECT id AS attempt_id, user_attempt, ai_feedback, is_correct, created_at
+            FROM attempts
+            WHERE session_id = $1
+            ORDER BY created_at DESC`,
+            [session_id]
+        );
+
+        return {
+            status: 200,
+            body: result.rows
+        };
+    }, 
+
+    // POST requests
     startStudySession: async ({ body: {topic, problem}, headers }) => {
         const user_id = await getUserIdFromToken(headers.authorization);
 

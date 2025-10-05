@@ -3,7 +3,43 @@ import { z } from "zod";
 
 const c = initContract();
 
+const StudySessionSchema = z.object({
+    id: z.number(),
+    topic: z.string(),
+    problem: z.string(),
+    created_at: z.string(),
+});
+
+const AttemptSchema = z.object({
+    attempt_id: z.number(),
+    user_attempt: z.string(),
+    ai_feedback: z.string(),
+    is_correct: z.boolean(),
+    created_at: z.string(),
+});
+
 export const contract = c.router({
+    // GET requests
+    getStudySessions: {
+        method: "GET",
+        path: "/sessions",
+        responses: {
+            200: z.array(StudySessionSchema)
+        },
+        summary: "Gets all the sessions belonging to a user."
+    },
+    getAttempts: {
+        method: "GET",
+        path: "/sessions/:session_id/attempts",
+        pathParams: z.object({
+            session_id: z.string()
+        }),
+        responses: {
+            200: z.array(AttemptSchema)
+        },
+        summary: "Gets all the user attempts pertaining to a certain session."
+    },
+    // POST requests
     startStudySession: {
         method: "POST",
         path: "/sessions/start",
@@ -12,16 +48,10 @@ export const contract = c.router({
             problem: z.string(),
         }),
         responses: {
-            200: z.object({
-                id: z.number(),
-                topic: z.string(),
-                problem: z.string(),
-                created_at: z.string(),
-            })
+            200: StudySessionSchema 
         },
         summary: "Starts a new session with a problem and topic."
     },
-    
     addAttempt: {
         method: "POST",
         path: "/sessions/:session_id/attempt",
@@ -32,13 +62,7 @@ export const contract = c.router({
             user_attempt: z.string()  
         }),
         responses: {
-            200: z.object({
-                attempt_id: z.number(),
-                user_attempt: z.string(),
-                ai_feedback: z.string(),
-                is_correct: z.boolean(),
-                created_at: z.string(),
-            })
+            200: AttemptSchema 
         },
         summary: "User sends a new attempt for AI feedback."
     },
