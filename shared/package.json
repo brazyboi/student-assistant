@@ -11,7 +11,6 @@
     "build": "tsc -p tsconfig.json"
   },
   "dependencies": {
-    "@ts-rest/core": "^3.52.1",
     "zod": "^3.23.2"
   },
   "devDependencies": {

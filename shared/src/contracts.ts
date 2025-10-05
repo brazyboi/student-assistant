@@ -8,14 +8,14 @@ export const contract = c.router({
         method: "POST",
         path: "/sessions/start",
         body: z.object({
-            user_id: z.string().uuid(),
             topic: z.string(),
             problem: z.string(),
         }),
         responses: {
             200: z.object({
                 id: z.number(),
-                user_id: z.string().uuid(),
+                topic: z.string(),
+                problem: z.string(),
                 created_at: z.string(),
             })
         },
@@ -24,7 +24,7 @@ export const contract = c.router({
     
     addAttempt: {
         method: "POST",
-        path: "sessions/:session_id/attempt",
+        path: "/sessions/:session_id/attempt",
         pathParams: z.object({
             session_id: z.string()
         }),

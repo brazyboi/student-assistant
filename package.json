@@ -2,5 +2,12 @@
   "name": "student-assistant",
   "private": true,
   "type": "module",
-  "workspaces": ["shared", "server", "client"]
+  "workspaces": [
+    "shared",
+    "server",
+    "client"
+  ],
+  "dependencies": {
+    "@ts-rest/core": "^3.52.1"
+  }
 }

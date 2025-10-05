@@ -8,7 +8,8 @@ import ChatSidebar from "./components/ChatSidebar";
 import ProblemHelpButtonGroup from "./components/ProblemHelpButton";
 
 // Backend
-import { sendMessage } from "./api/chat";
+// import { sendMessage } from "./api/chat";
+import { startSession } from "./api/chat";
 
 // Types
 import type { Chat, QueryMode, Profile } from "./types";
@@ -33,71 +34,87 @@ export default function App() {
 
   const [loading, setLoading] = useState(false);
 
-  async function handleSend(userText: string) {
-    const selectedChat = chatsState.find((c) => c.id === selectedChatId);
+  async function handleStartSession(problem: string) {
+    const selectedChat = chatsState.find((c) => c.id === selectedChatId); 
     if (!selectedChat) return;
 
-    // Optimistically add user message
     setChatsState((prevChats) =>
       prevChats.map((chat) =>
         chat.id === selectedChatId
           ? {
               ...chat,
-              messages: [...chat.messages, { sender: "user", text: userText }],
+              messages: [...chat.messages, { sender: "user", text: problem }],
             }
           : chat
       )
-    );
+    ); 
+  };
 
-    setLoading(true);
+  // async function handleSend(userText: string) {
+  //   const selectedChat = chatsState.find((c) => c.id === selectedChatId);
+  //   if (!selectedChat) return;
 
-    try {
-      // Get AI reply
-      const reply = await sendMessage(selectedChat, userText, { mode: 'question' });
+  //   // Optimistically add user message
+  //   setChatsState((prevChats) =>
+  //     prevChats.map((chat) =>
+  //       chat.id === selectedChatId
+  //         ? {
+  //             ...chat,
+  //             messages: [...chat.messages, { sender: "user", text: userText }],
+  //           }
+  //         : chat
+  //     )
+  //   );
 
-      setChatsState((prevChats) =>
-        prevChats.map((chat) =>
-          chat.id === selectedChatId
-            ? {
-                ...chat,
-                messages: [...chat.messages, { sender: "ai", text: reply }],
-              }
-            : chat
-        )
-      );
+  //   setLoading(true);
 
+  //   try {
+  //     // Get AI reply
+  //     const reply = await sendMessage(selectedChat, userText, { mode: 'question' });
 
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function handleHelpClick(helpType: QueryMode) {
-    const selectedChat = chatsState.find((c) => c.id === selectedChatId);
-    if (!selectedChat) return;
-
-    setLoading(true);
-
-    try {
-      // Get AI reply
-      const reply = await sendMessage(selectedChat, '', helpType);
-
-      setChatsState((prevChats) =>
-        prevChats.map((chat) =>
-          chat.id === selectedChatId
-            ? {
-                ...chat,
-                messages: [...chat.messages, { sender: "ai", text: reply }],
-              }
-            : chat
-        )
-      );
+  //     setChatsState((prevChats) =>
+  //       prevChats.map((chat) =>
+  //         chat.id === selectedChatId
+  //           ? {
+  //               ...chat,
+  //               messages: [...chat.messages, { sender: "ai", text: reply }],
+  //             }
+  //           : chat
+  //       )
+  //     );
 
 
-    } finally {
-      setLoading(false);
-    }
-  }
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // }
+
+  // async function handleHelpClick(helpType: QueryMode) {
+  //   const selectedChat = chatsState.find((c) => c.id === selectedChatId);
+  //   if (!selectedChat) return;
+
+  //   setLoading(true);
+
+  //   try {
+  //     // Get AI reply
+  //     const reply = await sendMessage(selectedChat, '', helpType);
+
+  //     setChatsState((prevChats) =>
+  //       prevChats.map((chat) =>
+  //         chat.id === selectedChatId
+  //           ? {
+  //               ...chat,
+  //               messages: [...chat.messages, { sender: "ai", text: reply }],
+  //             }
+  //           : chat
+  //       )
+  //     );
+
+
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // }
   
   function handleAddChat() {
     console.log("Adding chat")
@@ -121,13 +138,13 @@ export default function App() {
       {currentMessages.length === 0 ? (
         <main className="flex flex-col h-full w-full px-[20vw] items-center justify-center">
           <h1>Student Assistant</h1>
-          <ChatInput onSend={handleSend} />
+          <ChatInput onSend={handleStartSession} />
         </main>
       ) : (
         <main className="flex flex-col px-[20vw] h-full w-full">
           <ChatWindow messages={currentMessages} loading={loading}/>
-          <ProblemHelpButtonGroup onHint={() => handleHelpClick({ mode: "hint"} )} onAnswer={() => handleHelpClick({ mode: "answer" })} onExplanation={() => handleHelpClick({ mode: "explanation" })}/>
-          <ChatInput onSend={handleSend} />
+          {/* <ProblemHelpButtonGroup onHint={() => handleHelpClick({ mode: "hint"} )} onAnswer={() => handleHelpClick({ mode: "answer" })} onExplanation={() => handleHelpClick({ mode: "explanation" })}/> */}
+          <ChatInput onSend={handleStartSession} />
         </main>
       )}
       <ProfileManager activeProfile={activeProfile} setActiveProfile={(profile: any) => setActiveProfile(profile)}/>

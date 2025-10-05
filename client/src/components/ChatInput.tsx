@@ -25,7 +25,7 @@ export default function ChatInput({ onSend }: { onSend: (message: string) => voi
     return (
         <form 
             onSubmit={handleSubmit} 
-            className="relative mt-2 justify-center w-full"
+            className="relative mb-4 justify-center w-full"
         >
             <Textarea
                 ref={textareaRef}
