@@ -2,6 +2,9 @@ import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Icon } from '@iconify/react';
+
+// import { Github, Google } from "lucide-react";
 
 import { 
   Dialog,
@@ -30,49 +33,72 @@ const dialogTitleMap = {
 }
 
 export default function ProfileDialog( {dialogType, onLoginSuccess}: ProfileDialogProps ) {
-  const [email, setEmail] = React.useState("");
-  const [password, setPassword] = React.useState("");
+  // const [email, setEmail] = React.useState("");
+  // const [password, setPassword] = React.useState("");
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
+  const handleSignInGoogle = async () => {
     try {
-      let data: any = null;
-      let error: any = null;
-
-      if (dialogType == 'create') {
-        ({ data, error } = await supabase.auth.signUp({ email, password }));
-      } else if (dialogType == 'login') {
-        ({ data, error } = await supabase.auth.signInWithPassword({ email, password }));
-      }
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin, // after login, redirect here
+        },
+      });
 
       if (error) {
-        console.error("Supabase auth error:", error.message)
-        return;
+        console.error('Google sign-in error:', error.message)
+      } else {
+        console.log('Redirecting to Google OAuth...', data)
       }
-      console.log("Profile signup/signin data", data);
-
-      if (data?.user) {
-        onLoginSuccess({ id: data.user.id, email: data.user.email } as Profile);
-      }
-      
     } catch (err) {
-      console.error('Unexpected error');
+      console.log("Google OAuth error: ", err);
     }
-
-    
-
-    /*if (dialogType == 'create') {
-      response = createProfile(email, password);
-    } else if (dialogType == 'login') {
-      response = loginProfile(email, password);
-    }
-
-    response?.then((data) => {
-      console.log("ProfileDialog response data:", data);
-      onLoginSuccess(data as Profile);
-    });*/
   };
+
+  React.useEffect(() => {
+    const checkSession = async () => {
+      const { data, error } = await supabase.auth.getUser();
+      if (data?.user) {
+        onLoginSuccess({
+          id: data.user.id,
+          email: data.user.email,
+        } as Profile);
+      } else if (error) {
+        console.log('No user found:', error.message);
+      }
+    };
+
+    checkSession();
+  }, []);
+
+  // const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  //   event.preventDefault();
+
+  //   try {
+  //     let data: any = null;
+  //     let error: any = null;
+
+  //     if (dialogType == 'create') {
+  //       ({ data, error } = await supabase.auth.signUp({ email, password }));
+  //     } else if (dialogType == 'login') {
+  //       ({ data, error } = await supabase.auth.signInWithPassword({ email, password }));
+  //     }
+
+  //     if (error) {
+  //       console.error("Supabase auth error:", error.message)
+  //       return;
+  //     }
+  //     console.log("Profile signup/signin data", data);
+
+  //     if (data?.user) {
+  //       onLoginSuccess({ id: data.user.id, email: data.user.email } as Profile);
+  //     }
+      
+  //   } catch (err) {
+  //     console.error('Unexpected error');
+  //   }
+
+  // };
 
   return (
     <Dialog>
@@ -81,11 +107,28 @@ export default function ProfileDialog( {dialogType, onLoginSuccess}: ProfileDial
       </DialogTrigger>
       <DialogContent>          
         <DialogHeader>
-          <DialogTitle>{dialogTitleMap[dialogType]}</DialogTitle>
-          <DialogDescription>Please enter your email and password.</DialogDescription>
+          <DialogTitle>Sign In</DialogTitle>
+          <DialogDescription>Continue using one of the options below.</DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className='grid gap-3'>
+        <div className='grid gap-2 grid-cols-2'>
+          <Button variant='outline' size='lg' className='cursor-pointer border-2' onClick={handleSignInGoogle}>
+            <Icon icon="logos:google-icon"/>
+            Google
+          </Button>
+          <Button variant='outline' size='lg' className='cursor-pointer border-2'>
+            <Icon icon="mdi:github"/>
+            GitHub
+          </Button>
+        </div>
+
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button>Close</Button>
+          </DialogClose>
+        </DialogFooter>
+
+        {/* <form onSubmit={handleSubmit} className='grid gap-3'>
           <Label htmlFor="email">Email</Label>
           <Input type="email" placeholder="m@example.com" onChange={(e) => setEmail(e.target.value)} required />
           <Label htmlFor="password">Password</Label>
@@ -96,7 +139,7 @@ export default function ProfileDialog( {dialogType, onLoginSuccess}: ProfileDial
             </DialogClose>
             <Button type="submit" onClick={(e) => console.log("Clicked submit")}>Submit</Button>
           </DialogFooter> 
-        </form>
+        </form> */}
 
       </DialogContent>
     </Dialog>

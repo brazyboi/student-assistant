@@ -1,5 +1,5 @@
 export interface Profile {
-  id: number;
+  id: string;
   email: string;
 }
 
@@ -10,7 +10,7 @@ export interface Message {
 
 export interface Chat {
   id: number;
-  profile_id: number;
+  profile_id: string;
   title: string;
   messages: Message[];
 }

@@ -32,7 +32,7 @@ export default function ProfileManager({ activeProfile, setActiveProfile }: Prof
       { activeProfile === null ? (
         <div className="fixed top-4 right-4">
           <div className="flex">
-            <ProfileDialog dialogType="create" onLoginSuccess={setActiveProfile} />
+            {/* <ProfileDialog dialogType="create" onLoginSuccess={setActiveProfile} /> */}
             <ProfileDialog dialogType="login" onLoginSuccess={setActiveProfile} />
           </div>
         </div>

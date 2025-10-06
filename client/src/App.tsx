@@ -9,30 +9,18 @@ import ProblemHelpButtonGroup from "./components/ProblemHelpButton";
 
 // Backend
 // import { sendMessage } from "./api/chat";
-import { startSession, addAttempt as apiAddAttempt } from "./api/chat";
+import { startSession, addAttempt } from "./api/chat";
 
 // Types
 import type { Chat, QueryMode, Profile } from "./types";
 
 export default function App() {
-  // const chats: Chat[] = [
-  //   { 
-  //     id: 5050,
-  //     profile_id: 1, 
-  //     title: "Current Chat", 
-  //     messages: [ 
-  //     ]
-  //   },
-  // ];
-  // const testProfile = { id: 1, email: 'hi@gmail.com'} as Profile;
-
   const [activeProfile, setActiveProfile] = useState<Profile | null>(null);
   const [chatsState, setChatsState] = useState<Chat[]>([]);
   const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const currentMessages = chatsState.find((chat) => chat.id === selectedChatId)?.messages ?? [];
-
-  const [loading, setLoading] = useState(false);
 
   async function handleStartSession(problem: string) {
     if (!activeProfile) {
@@ -42,7 +30,6 @@ export default function App() {
 
     setLoading(true);
     try {
-      // Use a default topic for now; can be enhanced to prompt user for topic
       const topic = "General";
       const result = await startSession(topic, problem);
       if (!result?.id) {
@@ -87,7 +74,8 @@ export default function App() {
     );
 
     try {
-      const result = await apiAddAttempt(sessionId, user_attempt);
+      setLoading(true);
+      const result = await addAttempt(sessionId, user_attempt);
       if (result) {
         const aiFeedback = (result as any).ai_feedback ?? "";
         // Append AI feedback message
@@ -103,75 +91,11 @@ export default function App() {
       }
     } catch (err) {
       console.error("addAttempt error:", err);
+    } finally {
+      setLoading(false);
     }
   }
 
-  // async function handleSend(userText: string) {
-  //   const selectedChat = chatsState.find((c) => c.id === selectedChatId);
-  //   if (!selectedChat) return;
-
-  //   // Optimistically add user message
-  //   setChatsState((prevChats) =>
-  //     prevChats.map((chat) =>
-  //       chat.id === selectedChatId
-  //         ? {
-  //             ...chat,
-  //             messages: [...chat.messages, { sender: "user", text: userText }],
-  //           }
-  //         : chat
-  //     )
-  //   );
-
-  //   setLoading(true);
-
-  //   try {
-  //     // Get AI reply
-  //     const reply = await sendMessage(selectedChat, userText, { mode: 'question' });
-
-  //     setChatsState((prevChats) =>
-  //       prevChats.map((chat) =>
-  //         chat.id === selectedChatId
-  //           ? {
-  //               ...chat,
-  //               messages: [...chat.messages, { sender: "ai", text: reply }],
-  //             }
-  //           : chat
-  //       )
-  //     );
-
-
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // }
-
-  // async function handleHelpClick(helpType: QueryMode) {
-  //   const selectedChat = chatsState.find((c) => c.id === selectedChatId);
-  //   if (!selectedChat) return;
-
-  //   setLoading(true);
-
-  //   try {
-  //     // Get AI reply
-  //     const reply = await sendMessage(selectedChat, '', helpType);
-
-  //     setChatsState((prevChats) =>
-  //       prevChats.map((chat) =>
-  //         chat.id === selectedChatId
-  //           ? {
-  //               ...chat,
-  //               messages: [...chat.messages, { sender: "ai", text: reply }],
-  //             }
-  //           : chat
-  //       )
-  //     );
-
-
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // }
-  
   function handleAddChat() {
     console.log("Adding chat")
     setChatsState((prevChats) => {
