@@ -117,7 +117,7 @@ export default function App() {
       />
       {!selectedChatId || currentMessages.length === 0 ? (
         <main className="flex flex-col h-full w-full px-[20vw] items-center justify-center">
-          <h1>Student Assistant</h1>
+          <h1 className='mb-2'>Student Assistant</h1>
           <ChatInput onSend={handleStartSession} />
         </main>
       ) : (

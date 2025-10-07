@@ -46,12 +46,10 @@ export default function ProfileDialog( {dialogType, onLoginSuccess}: ProfileDial
       });
 
       if (error) {
-        console.error('Google sign-in error:', error.message)
-      } else {
-        console.log('Redirecting to Google OAuth...', data)
-      }
+        console.error('Google sign-in error...');
+      }  
     } catch (err) {
-      console.log("Google OAuth error: ", err);
+      console.log("Google OAuth error...");
     }
   };
 
@@ -103,15 +101,17 @@ export default function ProfileDialog( {dialogType, onLoginSuccess}: ProfileDial
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button size='sm' className="whitespace-nowrap px-4 mx-1">{dialogTitleMap[dialogType]}</Button> 
+        <Button variant='ghost' size='sm' className="whitespace-nowrap mx-1 cursor-pointer">
+          {dialogTitleMap[dialogType]}
+        </Button> 
       </DialogTrigger>
-      <DialogContent>          
+      <DialogContent className='w-1/3'>          
         <DialogHeader>
           <DialogTitle>Sign In</DialogTitle>
           <DialogDescription>Continue using one of the options below.</DialogDescription>
         </DialogHeader>
 
-        <div className='grid gap-2 grid-cols-2'>
+        <div className='grid gap-2 grid-cols-1'>
           <Button variant='outline' size='lg' className='cursor-pointer border-2' onClick={handleSignInGoogle}>
             <Icon icon="logos:google-icon"/>
             Google
@@ -121,12 +121,6 @@ export default function ProfileDialog( {dialogType, onLoginSuccess}: ProfileDial
             GitHub
           </Button>
         </div>
-
-        <DialogFooter>
-          <DialogClose asChild>
-            <Button>Close</Button>
-          </DialogClose>
-        </DialogFooter>
 
         {/* <form onSubmit={handleSubmit} className='grid gap-3'>
           <Label htmlFor="email">Email</Label>

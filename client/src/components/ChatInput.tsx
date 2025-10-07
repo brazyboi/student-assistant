@@ -41,7 +41,7 @@ export default function ChatInput({ onSend }: { onSend: (message: string) => voi
             <Button 
                 type='submit'
                 size='icon'
-                className='absolute rounded-full bottom-2 right-2 h-8 w-8'
+                className='absolute rounded-full bottom-2 right-2 h-8 w-8 cursor-pointer'
             >
                 <Send className="self-center"/>
             </Button>

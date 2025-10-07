@@ -1,10 +1,12 @@
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback} from "@/components/ui/avatar"
 import { 
   DropdownMenu,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { User } from 'lucide-react'; 
+
 
 import ProfileDialog from "./ProfileDialog";
 import { supabase } from "@/api/supabaseClient";
@@ -23,7 +25,7 @@ export default function ProfileManager({ activeProfile, setActiveProfile }: Prof
     if (error) {
       console.error("Supabase signout error: ", error)
     }
-    console.log("I signed out");
+    console.log("User signed out.");
     setActiveProfile(null);
   };
 
@@ -42,18 +44,20 @@ export default function ProfileManager({ activeProfile, setActiveProfile }: Prof
             <Button
               size="lg"
               aria-label="open profile"
-              className="fixed top-4 right-4 z-10 bg-white"
+              className="fixed top-4 right-4 px-2 cursor-pointer"
             >
               <Avatar>
-                <AvatarImage src="https://github.com/shadcn.png" />
-                <AvatarFallback>CN</AvatarFallback>
+                <AvatarFallback className='bg-transparent'>
+                  <User className="w-5 h-5"></User>
+                </AvatarFallback>
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
 
-          <DropdownMenuContent>
-            <DropdownMenuItem>Profile</DropdownMenuItem>
-            <DropdownMenuItem>Settings</DropdownMenuItem>
+          <DropdownMenuContent align="end" className='mt-2'>
+            <DropdownMenuItem className="cursor-pointer">
+              Settings
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

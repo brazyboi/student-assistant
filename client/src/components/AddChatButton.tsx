@@ -11,7 +11,7 @@ const AddChatButton: React.FC<AddChatButtonProps> = ({ onAdd }) => {
     <React.Fragment>
       <Button
         color="success"
-        className="mb-1"
+        className="mb-1 cursor-pointer"
         onClick={onAdd}
       >
         + New Chat
