@@ -1,7 +1,11 @@
 import { useState, useEffect } from "react";
+
+// import { Sidebar } from '@/components/ui/sidebar';
+
 import ChatTab from "./ChatTab";
 import AddChatButton from "./AddChatButton";
 import type { Chat } from "../types";
+import { useSelectedChatId } from "@/lib/state";
 
 interface SidebarProps {
     chats: Chat[];
@@ -10,12 +14,13 @@ interface SidebarProps {
     onAddChat: () => void;
 }
 
-export default function ChatSidebar({ chats, onSelectChat, selectedChatId, onAddChat } : SidebarProps) {
+export default function ChatSidebar({ chats, onAddChat } : SidebarProps) {
     const [sidebarWidth, setSidebarWidth] = useState(500);
     const [isDragging, setDragging] = useState(false);
-
     const [startX, setStartX] = useState(0);
     const [startWidth, setStartWidth] = useState(0);
+    
+    const selectedChatId = useSelectedChatId((state) => state.chatId); 
 
     const handleMouseDown = (e: React.MouseEvent) => {
         setDragging(true);
@@ -25,7 +30,7 @@ export default function ChatSidebar({ chats, onSelectChat, selectedChatId, onAdd
     };
 
     useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
+        const handleMouseMove = (e: MouseEvent) => {
         if (!isDragging) return;
         const deltaX = e.clientX - startX;
         setSidebarWidth(Math.max(150, startWidth + deltaX));
@@ -54,7 +59,7 @@ export default function ChatSidebar({ chats, onSelectChat, selectedChatId, onAdd
                         key={chat.id} 
                         title={chat.title}
                         selected={chat.id === selectedChatId}
-                        onClick={() => onSelectChat(chat.id)}
+                        onClick={() => useSelectedChatId((state) => state.setChatId(chat.id))}
                     />
                 ))}
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 // Components
 import ChatInput from "./components/ChatInput";
@@ -7,20 +7,49 @@ import ProfileManager from "./components/ProfileManager"
 import ChatSidebar from "./components/ChatSidebar";
 import ProblemHelpButtonGroup from "./components/ProblemHelpButton";
 
+// State
+import { useActiveUser, useSelectedChatId } from './lib/state';
+
 // Backend
 // import { sendMessage } from "./api/chat";
-import { startSession, addAttempt } from "./api/chat";
+import { startSession, addAttempt } from "@/api/chat";
+import { supabase } from "@/api/supabaseClient";
 
 // Types
 import type { Chat, QueryMode, Profile } from "./types";
 
 export default function App() {
-  const [activeProfile, setActiveProfile] = useState<Profile | null>(null);
+  const activeProfile = useActiveUser((state) => state.activeUser);
+  const setActiveUser = useActiveUser((state) => state.setActiveUser);
+
+  const selectedChatId = useSelectedChatId((state) => state.chatId);
   const [chatsState, setChatsState] = useState<Chat[]>([]);
-  const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
 
   const currentMessages = chatsState.find((chat) => chat.id === selectedChatId)?.messages ?? [];
+
+  useEffect(() => {
+    const getLoginSession = async () => {
+      const { data, error } = await supabase.auth.getSession();
+      if (data.session?.user) {
+        setActiveUser({ id: data.session.user.id, email: data.session.user.email } as Profile);
+      }
+    }
+
+    getLoginSession();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        setActiveUser({ id: session.user.id, email: session.user.email } as Profile);
+      } else {
+        setActiveUser(null);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [setActiveUser]);
 
   async function handleStartSession(problem: string) {
     if (!activeProfile) {
@@ -48,7 +77,7 @@ export default function App() {
       };
 
       setChatsState((prev) => [...prev, newChat]);
-      setSelectedChatId(sessionId);
+      useSelectedChatId((state) => state.setChatId(sessionId));
     } catch (err) {
       console.error("startSession error:", err);
     } finally {
@@ -102,7 +131,7 @@ export default function App() {
       const newId = prevChats.length > 0 ? Math.max(...prevChats.map(c => c.id)) + 1 : 1;
       if (!activeProfile) return prevChats;
       const newChat : Chat = { id: newId, profile_id: activeProfile.id, title: `Chat ${newId}`, messages: [] };
-      setSelectedChatId(newId);
+      useSelectedChatId((state) => state.setChatId(newId));
       return [...prevChats, newChat];
     });
   }
@@ -111,13 +140,13 @@ export default function App() {
     <div className="flex h-screen">
       <ChatSidebar 
         chats={chatsState} 
-        onSelectChat={setSelectedChatId} 
         selectedChatId={selectedChatId}
         onAddChat={handleAddChat}
+        onSelectChat={()=>{}}
       />
       {!selectedChatId || currentMessages.length === 0 ? (
         <main className="flex flex-col h-full w-full px-[20vw] items-center justify-center">
-          <h1 className='mb-2'>Student Assistant</h1>
+          {/* <h1 className='mb-2'>Student Assistant</h1> */}
           <ChatInput onSend={handleStartSession} />
         </main>
       ) : (
@@ -127,7 +156,7 @@ export default function App() {
           <ChatInput onSend={handleAddAttempt} />
         </main>
       )}
-      <ProfileManager activeProfile={activeProfile} setActiveProfile={(profile: any) => setActiveProfile(profile)}/>
+      <ProfileManager/>
     </div>
   );
 }

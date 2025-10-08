@@ -11,4 +11,3 @@ A (study) session consists of one problem. The workflow is as follows:
 2. User attempts the problem.
 3. Receives AI feedback until problem has been solved.
 4. User can also ask for concept explanations during the problem.
-

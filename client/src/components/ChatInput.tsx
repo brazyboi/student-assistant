@@ -32,7 +32,7 @@ export default function ChatInput({ onSend }: { onSend: (message: string) => voi
                 rows={1}
                 onInput={handleInput}
                 placeholder='Enter problem...'
-                className="resize-none overflow-hidden break-words whitespace-pre-wrap break-all pr-12 border-2 border-secondary"
+                className="resize-none overflow-hidden break-words whitespace-pre-wrap break-all pr-12 border-1 border-secondary"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 autoComplete='off'

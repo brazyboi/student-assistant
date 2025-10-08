@@ -4,38 +4,45 @@ import {
   DropdownMenu,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuContent
 } from "@/components/ui/dropdown-menu";
 import { User } from 'lucide-react'; 
 
+// State
+import { useActiveUser } from '@/lib/state';
 
+// Backend
+import { getSessions } from "@/api/chat";
 import ProfileDialog from "./ProfileDialog";
 import { supabase } from "@/api/supabaseClient";
 
 import type { Profile } from "../types"
-import { DropdownMenuContent } from "@radix-ui/react-dropdown-menu";
 
-interface ProfileManagerProps {
-  activeProfile: Profile | null;
-  setActiveProfile: (profile: any) => void;
-};
+export default function ProfileManager() {
+  const activeUser = useActiveUser((state) => state.activeUser);
 
-export default function ProfileManager({ activeProfile, setActiveProfile }: ProfileManagerProps) {
+  const handleLoginSuccess = async (profile: Profile) => {
+    // const userSessions = await getSessions(); 
+    // TODO: set user sessions...
+    useActiveUser((state) => state.setActiveUser(profile));
+  }
+
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
       console.error("Supabase signout error: ", error)
+    } else {
+      console.log("User signed out.");
     }
-    console.log("User signed out.");
-    setActiveProfile(null);
+    useActiveUser((state) => state.setActiveUser(null));
   };
 
   return (
     <>
-      { activeProfile === null ? (
+      { activeUser === null ? (
         <div className="fixed top-4 right-4">
           <div className="flex">
-            {/* <ProfileDialog dialogType="create" onLoginSuccess={setActiveProfile} /> */}
-            <ProfileDialog dialogType="login" onLoginSuccess={setActiveProfile} />
+            <ProfileDialog dialogType="login" onLoginSuccess={handleLoginSuccess} />
           </div>
         </div>
       ) : (
