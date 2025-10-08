@@ -19,12 +19,13 @@ import { supabase } from "@/api/supabaseClient";
 import type { Profile } from "../types"
 
 export default function ProfileManager() {
-  const activeUser = useActiveUser((state) => state.activeUser);
+  const activeUser = useActiveUser((s) => s.activeUser);
+  const setActiveUser = useActiveUser((s) => s.setActiveUser);
 
   const handleLoginSuccess = async (profile: Profile) => {
     // const userSessions = await getSessions(); 
     // TODO: set user sessions...
-    useActiveUser((state) => state.setActiveUser(profile));
+    setActiveUser(profile);
   }
 
   const handleLogout = async () => {

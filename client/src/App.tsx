@@ -19,10 +19,12 @@ import { supabase } from "@/api/supabaseClient";
 import type { Chat, QueryMode, Profile } from "./types";
 
 export default function App() {
-  const activeProfile = useActiveUser((state) => state.activeUser);
-  const setActiveUser = useActiveUser((state) => state.setActiveUser);
+  const activeProfile = useActiveUser((s) => s.activeUser);
+  const setActiveUser = useActiveUser((s) => s.setActiveUser);
 
-  const selectedChatId = useSelectedChatId((state) => state.chatId);
+  const selectedChatId = useSelectedChatId((s) => s.chatId);
+  const setSelectedChatId = useSelectedChatId((s) => s.setChatId);
+
   const [chatsState, setChatsState] = useState<Chat[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -77,7 +79,7 @@ export default function App() {
       };
 
       setChatsState((prev) => [...prev, newChat]);
-      useSelectedChatId((state) => state.setChatId(sessionId));
+      setSelectedChatId(sessionId);
     } catch (err) {
       console.error("startSession error:", err);
     } finally {
@@ -127,13 +129,20 @@ export default function App() {
 
   function handleAddChat() {
     console.log("Adding chat")
-    setChatsState((prevChats) => {
-      const newId = prevChats.length > 0 ? Math.max(...prevChats.map(c => c.id)) + 1 : 1;
-      if (!activeProfile) return prevChats;
-      const newChat : Chat = { id: newId, profile_id: activeProfile.id, title: `Chat ${newId}`, messages: [] };
-      useSelectedChatId((state) => state.setChatId(newId));
-      return [...prevChats, newChat];
-    });
+    if (!activeProfile) return;
+
+    const newId =
+      chatsState.length > 0 ? Math.max(...chatsState.map((c) => c.id)) + 1 : 1;
+
+    const newChat: Chat = {
+      id: newId,
+      profile_id: activeProfile.id,
+      title: `Chat ${newId}`,
+      messages: [],
+    };
+
+    setChatsState((prevChats) => [...prevChats, newChat]);
+    setSelectedChatId(newId);
   }
 
   return (
