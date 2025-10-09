@@ -22,12 +22,12 @@ export default function ChatWindow({ messages, loading }: ChatWindowProps) {
       ))}
 
       {loading && (
-        <div className="flex items-center space-x-1 bg-gray-200 text-black px-3 py-2 rounded-lg w-fit mb-2">
-          <span className="w-2 h-2 bg-gray-500 rounded-full animate-bounce [animation-delay:-0.3s]" />
-          <span className="w-2 h-2 bg-gray-500 rounded-full animate-bounce [animation-delay:-0.15s]" />
-          <span className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" />
+        <div className="flex items-center space-x-2 bg-muted px-3 py-2 rounded-lg w-fit mb-2">
+          <div className="h-2 w-2 bg-muted-foreground rounded-full animate-pulse" />
+          <div className="h-2 w-2 bg-muted-foreground rounded-full animate-pulse [animation-delay:0.2s]" />
+          <div className="h-2 w-2 bg-muted-foreground rounded-full animate-pulse [animation-delay:0.4s]" />
         </div>
-      )}
+      )} 
 
       <div ref={bottomRef}/>
     </div>
