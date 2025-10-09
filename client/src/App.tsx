@@ -19,15 +19,16 @@ import { supabase } from "@/api/supabaseClient";
 import type { Chat, QueryMode, Profile, Message } from "./lib/types";
 
 export default function App() {
-  const activeProfile = useActiveUser((s) => s.activeUser);
+  const activeUser = useActiveUser((s) => s.activeUser);
   const setActiveUser = useActiveUser((s) => s.setActiveUser);
   const currentChats = useChats((s) => s.chats);
   const addChat = useChats((s) => s.addChat);
   const setChats = useChats((s) => s.setChats);
   const updateChatMessages = useChats((s) => s.updateChatMessages);
-  const selectedChat = useChats((s) => s.selectedChat);
-  const setSelectedChat = useChats((s) => s.setSelectedChat);
+  const selectedChatId = useChats((s) => s.selectedChatId);
+  const setSelectedChatId = useChats((s) => s.setSelectedChatId);
 
+  const selectedChat = currentChats.find(c => c.id === selectedChatId);
   const [loading, setLoading] = useState(false);
 
   // const currentMessages = chatsState.find((chat) => chat.id === selectedChatId)?.messages ?? [];
@@ -57,8 +58,8 @@ export default function App() {
   }, [setActiveUser]);
 
   async function handleStartSession(problem: string) {
-    if (!activeProfile) {
-      console.error("No active profile — cannot start session");
+    if (!activeUser) {
+      console.error("No active profile... cannot start session");
       return;
     }
     setLoading(true);
@@ -75,13 +76,13 @@ export default function App() {
       // Create a new chat representing this session
       const newChat: Chat = {
         id: sessionId,
-        profile_id: activeProfile.id,
+        profile_id: activeUser.id,
         title: (problem.length > 40 ? problem.slice(0, 37) + "..." : problem) || `Session ${sessionId}`,
         messages: [{ sender: "user", text: problem }],
       };
 
       addChat(newChat);
-      setSelectedChat(newChat);
+      setSelectedChatId(newChat.id);
     } catch (err) {
       console.error("startSession error:", err);
     } finally {
@@ -91,13 +92,15 @@ export default function App() {
 
   function addMessageToSelectedChat(message: Message) {
     if (!selectedChat) return;
-    updateChatMessages(selectedChat.id, [message]);
+    updateChatMessages(selectedChatId, [message]);
+    console.log(selectedChat.messages);
   }
 
   async function handleAddAttempt(user_attempt: string) {
     if (!selectedChat) return;
 
     addMessageToSelectedChat({ sender: "user", text: user_attempt } as Message);
+    console.log('my selected chat: ', selectedChat);
 
     try {
       if (!selectedChat) return;
@@ -120,7 +123,7 @@ export default function App() {
 
   function handleAddChat() {
     console.log("Adding chat")
-    if (!activeProfile) return;
+    if (!activeUser) return;
     if (!selectedChat?.messages) return; 
 
     const newId =
@@ -128,13 +131,13 @@ export default function App() {
 
     const newChat: Chat = {
       id: newId,
-      profile_id: activeProfile.id,
+      profile_id: activeUser.id,
       title: `Chat ${newId}`,
       messages: [],
     };
 
     addChat(newChat);
-    setSelectedChat(newChat);
+    setSelectedChatId(newChat.id);
   }
 
   return (

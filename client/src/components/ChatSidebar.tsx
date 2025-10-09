@@ -20,10 +20,9 @@ export default function ChatSidebar({ chats, onAddChat } : SidebarProps) {
     const [startX, setStartX] = useState(0);
     const [startWidth, setStartWidth] = useState(0);
 
-    const selectedChat = useChats((s) => s.selectedChat);
-    
-    const selectedChatId = selectedChat?.id ?? null;
-    const setSelectedChat = useChats((s) => s.setSelectedChat); 
+    const selectedChatId = useChats((s) => s.selectedChatId);
+    const setSelectedChatId = useChats((s) => s.setSelectedChatId); 
+    const selectedChat = chats.find(c => c.id === selectedChatId);
 
     const handleMouseDown = (e: React.MouseEvent) => {
         setDragging(true);
@@ -62,7 +61,7 @@ export default function ChatSidebar({ chats, onAddChat } : SidebarProps) {
                         key={chat.id} 
                         title={chat.title}
                         selected={chat.id === selectedChatId}
-                        onClick={() => setSelectedChat(chat)}
+                        onClick={() => setSelectedChatId(chat.id)}
                     />
                 ))}
 
