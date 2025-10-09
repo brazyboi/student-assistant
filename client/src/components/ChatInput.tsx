@@ -14,13 +14,20 @@ export default function ChatInput({ onSend }: { onSend: (message: string) => voi
         el.style.height = `${el.scrollHeight}px`
     }
 
-    function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-        e.preventDefault();
+    const handleSubmit = (e?: React.FormEvent<HTMLFormElement> | React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (e) e.preventDefault();
         const text = message.trim();
         if (!text) return;
         onSend(text);
         setMessage('');
     }
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            handleSubmit(e);
+        }
+    };
 
     return (
         <form 
@@ -31,8 +38,9 @@ export default function ChatInput({ onSend }: { onSend: (message: string) => voi
                 ref={textareaRef}
                 rows={1}
                 onInput={handleInput}
+                onKeyDown={handleKeyDown}
                 placeholder='Enter problem...'
-                className="resize-none overflow-hidden break-words whitespace-pre-wrap break-all pr-12 border-1 border-secondary"
+                className="resize-none overflow-hidden break-words whitespace-pre-wrap break-all pr-12 border-2 border-secondary"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 autoComplete='off'
