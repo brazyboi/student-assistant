@@ -1,4 +1,4 @@
-import { supabase } from "./supabaseClient";
+import { supabase } from "../lib/supabaseClient";
 import { initClient } from "@ts-rest/core";
 import { contract } from '@student-assistant/shared';
 
@@ -43,7 +43,7 @@ export async function addAttempt(session_id: number, user_attempt: string) {
     });
 
     if (result.status === 200) {
-      console.log("Attempt saved:", result.body);
+      // console.log("Attempt saved:", result.body);
       return result.body; // attempt_id, ai_feedback, etc.
     } else {
       console.error("Failed to add attempt:", result.status);
