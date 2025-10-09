@@ -17,7 +17,7 @@ import {
 
 
 import { supabase } from "../api/supabaseClient";
-import type { Profile } from "../types";
+import type { Profile } from "../lib/types";
 
 interface ProfileDialogProps {
   dialogType: 'create' | 'login';

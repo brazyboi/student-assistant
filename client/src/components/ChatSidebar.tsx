@@ -4,8 +4,8 @@ import { useState, useEffect } from "react";
 
 import ChatTab from "./ChatTab";
 import AddChatButton from "./AddChatButton";
-import type { Chat } from "../types";
-import { useSelectedChatId } from "@/lib/state";
+import type { Chat } from "../lib/types";
+import { useChats } from "@/lib/state";
 
 interface SidebarProps {
     chats: Chat[];
@@ -19,34 +19,36 @@ export default function ChatSidebar({ chats, onAddChat } : SidebarProps) {
     const [isDragging, setDragging] = useState(false);
     const [startX, setStartX] = useState(0);
     const [startWidth, setStartWidth] = useState(0);
+
+    const selectedChat = useChats((s) => s.selectedChat);
     
-    const selectedChatId = useSelectedChatId((s) => s.chatId); 
-    const setSelectedChatId = useSelectedChatId((s) => s.setChatId); 
+    const selectedChatId = selectedChat?.id ?? null;
+    const setSelectedChat = useChats((s) => s.setSelectedChat); 
 
-    // const handleMouseDown = (e: React.MouseEvent) => {
-    //     setDragging(true);
-    //     setStartX(e.clientX);
-    //     setStartWidth(sidebarWidth);
-    //     e.preventDefault();
-    // };
+    const handleMouseDown = (e: React.MouseEvent) => {
+        setDragging(true);
+        setStartX(e.clientX);
+        setStartWidth(sidebarWidth);
+        e.preventDefault();
+    };
 
-    // useEffect(() => {
-    //     const handleMouseMove = (e: MouseEvent) => {
-    //     if (!isDragging) return;
-    //     const deltaX = e.clientX - startX;
-    //     setSidebarWidth(Math.max(150, startWidth + deltaX));
-    //     };
+    useEffect(() => {
+        const handleMouseMove = (e: MouseEvent) => {
+        if (!isDragging) return;
+        const deltaX = e.clientX - startX;
+        setSidebarWidth(Math.max(150, startWidth + deltaX));
+        };
 
-    //     const handleMouseUp = () => setDragging(false);
+        const handleMouseUp = () => setDragging(false);
 
-    //     window.addEventListener("mousemove", handleMouseMove);
-    //     window.addEventListener("mouseup", handleMouseUp);
+        window.addEventListener("mousemove", handleMouseMove);
+        window.addEventListener("mouseup", handleMouseUp);
 
-    //     return () => {
-    //     window.removeEventListener("mousemove", handleMouseMove);
-    //     window.removeEventListener("mouseup", handleMouseUp);
-    //     };
-    // }, [isDragging, startX, startWidth]);
+        return () => {
+        window.removeEventListener("mousemove", handleMouseMove);
+        window.removeEventListener("mouseup", handleMouseUp);
+        };
+    }, [isDragging, startX, startWidth]);
 
   return (
         <aside
@@ -60,17 +62,17 @@ export default function ChatSidebar({ chats, onAddChat } : SidebarProps) {
                         key={chat.id} 
                         title={chat.title}
                         selected={chat.id === selectedChatId}
-                        onClick={() => setSelectedChatId(chat.id)}
+                        onClick={() => setSelectedChat(chat)}
                     />
                 ))}
 
             </div>
             <AddChatButton onAdd={onAddChat} />
 
-            {/* <div
+            <div
                 className="absolute top-0 right-0 h-full w-0.5 cursor-ew-resize bg-gray-600"
                 onMouseDown={handleMouseDown}
-            /> */}
+            />
            
         </aside>
   );

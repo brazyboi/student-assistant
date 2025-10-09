@@ -15,6 +15,7 @@ const ChatItem = ({ title, selected, onClick }: ChatTabProps) => {
         selected ? "font-bold" : "font-normal"
       )}
       color={selected ? "primary" : "inherit"}
+      variant={selected ? "default" : "ghost"}
       onClick={onClick}
     >
       {title}
