@@ -38,8 +38,8 @@ export function useChatActions() {
       };
 
       setChats([
-        ...chats.filter((c) => c.id !== tempId),
         newChat,
+        ...chats.filter((c) => c.id !== tempId),
       ]);
       // addChat(newChat);
       setSelectedChatId(newChat.id);
