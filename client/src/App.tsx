@@ -2,7 +2,6 @@
 import ChatInput from "./components/ChatInput";
 import ChatWindow from "./components/ChatWindow";
 import ProfileManager from "./components/ProfileManager"
-import ChatSidebar from "./components/ChatSidebar";
 // import ProblemHelpButtonGroup from "./components/ProblemHelpButton";
 
 // Types
@@ -17,8 +16,13 @@ export default function App() {
 
   return (
     <div className="flex h-screen">
-        <SidebarProvider>
-          <AppSidebar chats={chats}/>
+        <SidebarProvider 
+          defaultOpen={true}
+          style={{
+            "--sidebar-width": "18rem",
+          } as React.CSSProperties}
+        >
+          <AppSidebar chats={chats} onAddChat={addEmptyChat}/>
           <SidebarTrigger>
           </SidebarTrigger>
 

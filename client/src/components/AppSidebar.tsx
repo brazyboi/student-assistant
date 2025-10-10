@@ -20,7 +20,10 @@ export default function AppSidebar({ chats, onAddChat }: SidebarProps) {
     const selectedChatId = useChats((s) => s.selectedChatId);
     const setSelectedChatId = useChats((s) => s.setSelectedChatId); 
     return (
-        <Sidebar>
+        <Sidebar
+            collapsible='offcanvas'
+            variant='sidebar'
+        >
             <SidebarHeader className='text-center text-2xl mt-2'>Problems</SidebarHeader>
             <SidebarContent>
                 <SidebarGroup>
