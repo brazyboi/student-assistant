@@ -1,17 +1,16 @@
 import { startSession, addAttempt } from '@/api/chat';
 import type { Chat } from '@/lib/types';
-import { useState } from 'react';
 import { useChats, useActiveUser } from '@/lib/state';
 
 export function useChatActions() {
   const activeUser = useActiveUser((s) => s.activeUser);
-  const { chats, addChat, setChats, updateChatMessages, selectedChatId, setSelectedChatId } = useChats();
-  const [loading, setLoading] = useState(false);
+  const { chats, addChat, setChats, updateChatMessages, selectedChatId, setSelectedChatId, loadingAiFeedback, setLoadingAiFeedback } = useChats();
 
   const selectedChat = chats.find((c) => c.id === selectedChatId);
 
   async function startNewSession(problem: string) {
     if (!activeUser) return;
+    if (loadingAiFeedback) return;
     
     const problemTitle = problem.length > 40 ? problem.slice(0, 37) + "..." : problem
 
@@ -44,26 +43,27 @@ export function useChatActions() {
       // addChat(newChat);
       setSelectedChatId(newChat.id);
     } catch (err) {
-      console.error('Error adding session');
+      console.error('Error adding session', err);
       setChats([
         ...chats.filter((c) => c.id !== tempId),
       ]);
     } finally {
-      setLoading(false);
+      setLoadingAiFeedback(false);
     }
   }
 
   async function addAttemptMessage(text: string) {
     if (!selectedChat) return;
+    if (loadingAiFeedback) return;
     updateChatMessages(selectedChat.id, [{ sender: "user", text }]);
 
-    setLoading(true);
+    setLoadingAiFeedback(true);
     try {
       const result = await addAttempt(selectedChat.id, text);
       const aiFeedback = (result as any)?.ai_feedback ?? "";
       updateChatMessages(selectedChat.id, [{ sender: "ai", text: aiFeedback }]);
     } finally {
-      setLoading(false);
+      setLoadingAiFeedback(false);
     }
   }
 
@@ -75,7 +75,7 @@ export function useChatActions() {
   return { 
     chats, 
     selectedChat, 
-    loading, 
+    loadingAiFeedback, 
     startNewSession, 
     addAttemptMessage, 
     addEmptyChat 

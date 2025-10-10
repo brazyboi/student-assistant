@@ -2,10 +2,14 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea'
 import { Send } from 'lucide-react';
+import { useChats } from '@/lib/state';
 
-export default function ChatInput({ onSend }: { onSend: (message: string) => void; }) {
+export default function ChatInput({ onSend }: { onSend: (message: string) => void }) {
     const [message, setMessage] = React.useState('');
     const textareaRef = React.useRef<HTMLTextAreaElement>(null);
+    const loadingAiFeedback = useChats((state) => state.loadingAiFeedback);
+    const canSendMessage = useChats((state) => state.canSendMessage);
+    const setMessageSent = useChats((state) => state.setMessageSent);
 
     const handleInput = () => {
         const el = textareaRef.current
@@ -15,10 +19,14 @@ export default function ChatInput({ onSend }: { onSend: (message: string) => voi
     }
 
     const handleSubmit = (e?: React.FormEvent<HTMLFormElement> | React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (loadingAiFeedback || !canSendMessage) return;
         if (e) e.preventDefault();
+        if (loadingAiFeedback) return;
         const text = message.trim();
         if (!text) return;
         onSend(text);
+
+        setMessageSent();
         setMessage('');
     }
 

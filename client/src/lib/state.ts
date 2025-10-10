@@ -1,6 +1,8 @@
 import type { Profile, Chat, Message } from '@/lib/types';
 import { create } from 'zustand';
 
+const MESSAGE_COOLDOWN_MS = 1500;
+
 interface UserState {
     activeUser: Profile | null,
     setActiveUser: (profile: Profile | null) => void,
@@ -14,8 +16,13 @@ interface ChatsState {
     selectedChatId: number | null, 
     setSelectedChatId: (id: number | null) => void,
     updateChatMessages: (chatId: number | null, messages: Message[]) => void,
-    // selectedChatId: number | null, 
-    // setSelectedChatId: (chatId: number | null) => void,
+
+    loadingAiFeedback: boolean,
+    setLoadingAiFeedback: (loading: boolean) => void,
+    
+    lastMessageTimestamp: number,
+    canSendMessage: boolean,
+    setMessageSent: () => void,
 }
 
 export const useActiveUser = create<UserState>((set) => ({
@@ -41,6 +48,33 @@ export const useChats = create<ChatsState>((set) => ({
                 )
             }
         }),
+
+    loadingAiFeedback: false,
+    setLoadingAiFeedback: (loading) => {
+        set({ loadingAiFeedback: loading });
+
+        // When AI finishes loading, start cooldown timer
+        if (!loading) {
+            const cooldown = 2000; // 2 seconds
+            const now = Date.now();
+            set({ lastMessageTimestamp: now });
+
+            setTimeout(() => {
+                // Reset canSendMessage after cooldown
+                set({ lastMessageTimestamp: 0 });
+            }, cooldown);
+        }
+    },
+
+    lastMessageTimestamp: 0,
+    canSendMessage: true,
+    setMessageSent: () => {
+        const now = Date.now();
+        set({ lastMessageTimestamp: now });
+        // canSendMessage becomes false immediately, automatically reset in 2s
+        set({ canSendMessage: false });
+        setTimeout(() => set({ canSendMessage: true }), MESSAGE_COOLDOWN_MS);
+    },
 
     // selectedChatId: null,
     // setSelectedChatId: (chatId: number | null) => set({ selectedChatId: chatId }),

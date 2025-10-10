@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import 'katex/dist/katex.min.css'; 
 
 @custom-variant dark (&:is(.dark *));
 
@@ -209,6 +210,15 @@ h1 {
 .scroll-hover:hover {
   scrollbar-width: thin;
   scrollbar-color: rgba(100, 100, 100, 0.4) transparent;
+}
+
+/* in your global CSS, e.g., index.css */
+.scroll-hide::-webkit-scrollbar {
+  display: none;
+}
+.scroll-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 }
 
 @layer base {

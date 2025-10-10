@@ -62,11 +62,11 @@ export default function ProfileManager() {
             </Button>
           </DropdownMenuTrigger>
 
-          <DropdownMenuContent align="end" className='mt-2'>
-            <DropdownMenuItem className="cursor-pointer">
+          <DropdownMenuContent align="end" className='mt-1'>
+            {/* <DropdownMenuItem className="cursor-pointer">
               Settings
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
+            </DropdownMenuItem> */}
+            <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">Logout</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       )}
