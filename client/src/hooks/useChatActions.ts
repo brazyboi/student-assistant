@@ -61,7 +61,7 @@ export function useChatActions() {
     try {
       const result = await addAttempt(selectedChat.id, text);
       const aiFeedback = (result as any)?.ai_feedback ?? "";
-      updateChatMessages(selectedChat.id, [{ sender: "ai", text: "$\inf$" }]);
+      updateChatMessages(selectedChat.id, [{ sender: "ai", text: aiFeedback }]);
     } finally {
       setLoadingAiFeedback(false);
     }

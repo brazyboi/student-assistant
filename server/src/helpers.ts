@@ -29,7 +29,7 @@ export async function getAIFeedback(problem: string, user_attempt: string) {
     const prompt = `
 Problem ${problem}
 Student Assistant: ${user_attempt}
-Give concise, constructive feedback. 
+Give concise, constructive feedback. Surround any math using Latex using dollar signs.
     `;
 
     try {
