@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import MarkdownRenderer from '@/lib/Markdown';
 import { cn } from "@/lib/utils"
 
 interface ChatTabProps {
@@ -18,7 +19,7 @@ const ChatItem = ({ title, selected, onClick }: ChatTabProps) => {
       variant={selected ? "default" : "ghost"}
       onClick={onClick}
     >
-      {title}
+      <MarkdownRenderer markdown={title} />
     </Button>
   );
 };

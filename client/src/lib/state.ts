@@ -16,6 +16,7 @@ interface ChatsState {
     selectedChatId: number | null, 
     setSelectedChatId: (id: number | null) => void,
     updateChatMessages: (chatId: number | null, messages: Message[]) => void,
+    appendToLastMessage: (chatId: number | null, chunk: string) => void,
 
     loadingAiFeedback: boolean,
     setLoadingAiFeedback: (loading: boolean) => void,
@@ -47,6 +48,37 @@ export const useChats = create<ChatsState>((set) => ({
                         : c
                 )
             }
+        }),
+    
+    // For streaming: update the last AI message with new chunks
+    appendToLastMessage: (chatId: number | null, chunk: string) =>
+        set((state) => {
+            if (chatId == null) return state;
+            const chat = state.chats.find(c => c.id === chatId);
+            if (!chat) return state;
+
+            const messages = [...chat.messages];
+            const lastMsg = messages[messages.length - 1];
+            
+            // If last message is from AI, append to it
+            if (lastMsg?.sender === 'ai') {
+                messages[messages.length - 1] = {
+                    ...lastMsg,
+                    text: lastMsg.text + chunk
+                };
+            } else {
+                // Create new AI message
+                messages.push({
+                    sender: 'ai',
+                    text: chunk
+                });
+            }
+
+            return {
+                chats: state.chats.map(c =>
+                    c.id === chatId ? {...c, messages} : c
+                )
+            };
         }),
 
     loadingAiFeedback: false,

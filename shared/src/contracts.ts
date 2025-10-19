@@ -66,4 +66,18 @@ export const contract = c.router({
         },
         summary: "User sends a new attempt for AI feedback."
     },
+    streamAttemptFeedback : {
+        method: "POST",
+        path: "/sessions/:session_id/stream-attempt",
+        pathParams: z.object({
+            session_id: z.string()
+        }),
+        body: z.object({
+            user_attempt: z.string()
+        }),
+        responses: {
+            200: z.unknown()
+        },
+        summary: "Streams the AI feedback message in chunks in real time.",
+    }
 });
