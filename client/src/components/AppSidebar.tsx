@@ -23,9 +23,10 @@ export default function AppSidebar({ chats, onAddChat }: SidebarProps) {
         <Sidebar
             collapsible='offcanvas'
             variant='sidebar'
+            style={{ overflowX: 'hidden' }}
         >
             <SidebarHeader className='text-center text-2xl mt-2'>Problems</SidebarHeader>
-            <SidebarContent>
+            <SidebarContent style={{ overflowX: 'hidden' }}>
                 <SidebarGroup>
                     {chats.map((chat) => (
                         <ChatTab

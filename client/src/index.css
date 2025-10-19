@@ -221,6 +221,29 @@ h1 {
   scrollbar-width: none;  /* Firefox */
 }
 
+/* Custom thin scrollbar for chat window, visible on hover */
+.scroll-hide {
+  scrollbar-width: thin;
+  scrollbar-color: var(--muted-foreground) var(--muted);
+}
+.scroll-hide::-webkit-scrollbar {
+  width: 6px;
+  background: transparent;
+  transition: background 0.2s;
+}
+.scroll-hide::-webkit-scrollbar-thumb {
+  background: var(--muted-foreground);
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.scroll-hide:hover::-webkit-scrollbar-thumb {
+  opacity: 1;
+}
+.scroll-hide::-webkit-scrollbar-track {
+  background: transparent;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

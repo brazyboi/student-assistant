@@ -10,6 +10,13 @@ export default function ChatInput({ onSend }: { onSend: (message: string) => voi
     const loadingAiFeedback = useChats((state) => state.loadingAiFeedback);
     const canSendMessage = useChats((state) => state.canSendMessage);
     const setMessageSent = useChats((state) => state.setMessageSent);
+    const chats = useChats((s) => s.chats);
+    const selectedChatId = useChats((s) => s.selectedChatId);
+    const selectedChat = chats.find((c) => c.id === selectedChatId) ?? null;
+
+    const placeholderText = selectedChat && selectedChat.messages && selectedChat.messages.length > 0
+        ? 'Enter attempt...'
+        : 'Enter problem...';
 
     const handleInput = () => {
         const el = textareaRef.current
@@ -47,7 +54,7 @@ export default function ChatInput({ onSend }: { onSend: (message: string) => voi
                 rows={1}
                 onInput={handleInput}
                 onKeyDown={handleKeyDown}
-                placeholder='Enter problem...'
+                placeholder={placeholderText}
                 className="resize-none overflow-hidden break-words whitespace-pre-wrap break-all pr-12 border-2 border-secondary"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
