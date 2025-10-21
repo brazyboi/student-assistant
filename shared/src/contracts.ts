@@ -77,6 +77,7 @@ export const contract = c.router({
         }),
         responses: {
             200: z.unknown()
+            // 200: z.string()
         },
         summary: "Streams the AI feedback message in chunks in real time.",
     }

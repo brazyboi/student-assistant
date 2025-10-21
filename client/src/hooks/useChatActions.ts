@@ -1,4 +1,4 @@
-import { startSession, addAttempt } from '@/api/chat';
+import { startSession, addAttempt, streamAttemptFeedback } from '@/api/chat';
 import type { Chat } from '@/lib/types';
 import { useChats, useActiveUser } from '@/lib/state';
 
@@ -52,16 +52,32 @@ export function useChatActions() {
     }
   }
 
+  // async function addAttemptMessage(text: string) {
+  //   if (!selectedChat) return;
+  //   if (loadingAiFeedback) return;
+  //   updateChatMessages(selectedChat.id, [{ sender: "user", text }]);
+
+  //   setLoadingAiFeedback(true);
+  //   try {
+  //     const result = await addAttempt(selectedChat.id, text);
+  //     const aiFeedback = (result as any)?.ai_feedback ?? "";
+  //     updateChatMessages(selectedChat.id, [{ sender: "ai", text: aiFeedback }]);
+  //   } finally {
+  //     setLoadingAiFeedback(false);
+  //   }
+  // }
   async function addAttemptMessage(text: string) {
     if (!selectedChat) return;
     if (loadingAiFeedback) return;
     updateChatMessages(selectedChat.id, [{ sender: "user", text }]);
-
     setLoadingAiFeedback(true);
+    
     try {
-      const result = await addAttempt(selectedChat.id, text);
-      const aiFeedback = (result as any)?.ai_feedback ?? "";
-      updateChatMessages(selectedChat.id, [{ sender: "ai", text: aiFeedback }]);
+      const result = await streamAttemptFeedback(selectedChat.id, text, (chunk) => {
+        console.log("Chunk", chunk);
+      });
+      let aiFeedback = "";
+
     } finally {
       setLoadingAiFeedback(false);
     }

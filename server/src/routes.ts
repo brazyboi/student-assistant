@@ -2,6 +2,7 @@ import { contract } from "@student-assistant/shared";
 import pool from "./db.ts";
 import { getAIFeedback, getAIFeedbackStream, getUserIdFromToken } from "./helpers.ts";
 import { initServer } from "@ts-rest/express";
+import { Response } from "node-fetch";
 
 const s = initServer();
 
@@ -128,34 +129,41 @@ export const router = s.router(contract, {
 
         const problem = session_res.rows[0].problem;
 
+        const reader = await getAIFeedbackStream(problem, user_attempt, (chunk) => {});
+
         // Return a response with stream
         return {
             status: 200,
             // Set headers for SSE
             headers: {
-                'Content-Type': 'text/event-stream',
-                'Cache-Control': 'no-cache',
-                'Connection': 'keep-alive'
+                'Content-Type': 'text/plain',
+                // 'Cache-Control': 'no-cache',
+                'Access-Control-Allow-Origin': 'http://localhost:5173',
+                'Access-Control-Allow-Credentials': 'true',
             },
             // Return a ReadableStream that emits chunks
-            body: new ReadableStream({
-                async start(controller) {
-                    try {
-                        await getAIFeedbackStream(problem, user_attempt, (chunk) => {
-                            // Push each chunk as an SSE event
-                            controller.enqueue(`data: ${JSON.stringify({ text: chunk })}\n\n`);
-                        });
-                        
-                        // Signal end of stream
-                        controller.enqueue('event: end\ndata: {}\n\n');
-                        controller.close();
-                    } catch (err) {
-                        console.error("Streaming error:", err);
-                        controller.enqueue(`event: error\ndata: ${JSON.stringify({ error: "AI error" })}\n\n`);
-                        controller.close();
-                    }
-                }
-            })
+            body: reader,
+            // body: {
+            //     "hello": "what"
+            // },
+            // new ReadableStream({
+            //     async start(controller) {
+            //         try {
+            //             await getAIFeedbackStream(problem, user_attempt, (chunk) => {
+            //                 // Push each chunk as an SSE event
+            //                 controller.enqueue(`data: ${JSON.stringify({ text: chunk })}\n\n`);
+            //                 console.log('data', chunk);
+            //             });
+
+            //             // Signal end of stream
+            //             controller.enqueue('event: end\ndata: {}\n\n');
+            //             controller.close();
+            //         } catch (err) {
+            //             console.error("Streaming error:", err);
+            //             controller.enqueue(`event: error\ndata: ${JSON.stringify({ error: "AI error" })}\n\n`);
+            //             controller.close();
+            //         }
+            //     }
         };
     },
 });

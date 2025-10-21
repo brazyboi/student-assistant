@@ -49,6 +49,24 @@ export async function getAIFeedback(problem: string, user_attempt: string) {
     }
 }
 
+import { Readable } from 'stream';
+
+function webStreamToNode(stream: ReadableStream<Uint8Array>) {
+  const reader = stream.getReader();
+  return new Readable({
+    async read() {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) {
+          this.push(null); // end stream
+          break;
+        }
+        this.push(Buffer.from(value));
+      }
+    },
+  });
+}
+
 export async function getAIFeedbackStream(problem: string, user_attempt: string, onChunk: (chunk: string) => void) {
     const prompt = `
 Problem ${problem}
@@ -59,62 +77,56 @@ Only ever give incremental help on the problem, do not give them the full soluti
     `;
 
     try {
-        const stream = await openai.responses.create({
-            model: "gpt-4o-mini",
-            input: [
-                {
-                    role: "user",
-                    content: prompt,
-                }
-            ],
-            stream: true
-        });
-
-        let output = "";
-
-        for await (const event of stream) {
-            switch (event.type) {
-                case "response.output_text.delta": {
-                    // In the new OpenAI SDK, text chunks show up in these types
-                    const text = event.delta ?? "";
-                    if (typeof text === "string" && text.trim().length > 0) {
-                        onChunk(text);
-                    }
-                    break;
-                }
-
-                case "response.completed":
-                    break
-
-                case "error":
-                    console.error("OpenAI stream error:", event);
-                    break;
-
-                default:
-                    break;
-            }
-        } 
-
-        return output || "No feedback could be generated at this time.";
-
-        // for await (const event of stream) {
-        //     console.log(event); 
-        // }
-
-        // const ai_response = await openai.chat.completions.create({
+        // const stream = await openai.responses.create({
         //     model: "gpt-4o-mini",
-        //     messages: [
+        //     input: [
         //         {
         //             role: "user",
-        //             content: prompt
+        //             content: prompt,
         //         }
-        //     ]
+        //     ],
+        //     stream: true
         // });
+        
+        // for await (const event of stream) {
+        //     switch (event.type) {
+        //         case "response.output_text.delta":
+        //             const content = event.delta || "";
+        //             const sseChunk = `data: ${content}\n\n`
+        //             onChunk(sseChunk);
+        //             break;
+        //         default:
+        //             // console.log(event);
+        //             break;
+        //     }
 
-        // return ai_response.choices[0]?.message?.content ?? "No feedback generated..."
+        // }
+        const chunks = ["Hello", "world", "this", "is", "streaming"];
+
+        const readable = new ReadableStream({
+            async start(controller) {
+                try { 
+                    for (const chunk of chunks) {
+                        controller.enqueue(new TextEncoder().encode(chunk));
+                        await new Promise(res => setTimeout(res, 100)); // optional, simulate delay
+                    }
+                } catch (err) {
+                    controller.error(err);
+                } finally {
+                    controller.close();
+                }
+            }
+        })
+        return webStreamToNode(readable);
     } catch (err: any) {
         console.error("Error generating AI feedback", err.message || err);
-        return "AI feedback could not be generated at this time.";
+        const readable = new ReadableStream({
+            async start(controller) {
+                controller.enqueue("AI feedback could not be generated at this time");
+                controller.close();
+            }
+        })
+        return webStreamToNode(readable);
     }
 
 }

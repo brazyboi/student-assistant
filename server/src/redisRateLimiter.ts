@@ -1,5 +1,4 @@
 import type { NextFunction, Request, Response } from 'express';
-import pkg from 'express';
 import Redis from 'ioredis';
 import { RateLimiterRedis } from 'rate-limiter-flexible';
 
