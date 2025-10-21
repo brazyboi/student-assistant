@@ -43,7 +43,6 @@ export async function addAttempt(session_id: number, user_attempt: string) {
     });
 
     if (result.status === 200) {
-      // console.log("Attempt saved:", result.body);
       return result.body; // attempt_id, ai_feedback, etc.
     } else {
       console.error("Failed to add attempt:", result.status);
@@ -91,5 +90,70 @@ export async function getAttempts(session_id: number) {
     }
   } catch (err) {
     console.error(err);
+  }
+}
+
+export async function streamAttemptFeedback(
+  session_id: number, 
+  user_attempt: string,
+  onChunk: (chunk: string) => void,
+  onError?: (error: string) => void,
+  onComplete?: () => void
+) {
+  try {
+    const { data: sessionData } = await supabase.auth.getSession();
+    const token = sessionData?.session?.access_token;
+    if (!token) throw new Error("User not logged in.");
+
+    const result = await client.streamAttemptFeedback({
+      params: { session_id: session_id.toString() },
+      body: { user_attempt },
+      extraHeaders: { Authorization: `Bearer ${token}` },
+    });
+
+    if (result.status !== 200 || !result.body) {
+      throw new Error(`Stream failed with status ${result.status}`);
+    }
+
+    // Type assertion since we know the body is a ReadableStream from our API contract
+    const stream = result.body as ReadableStream<Uint8Array>;
+    const reader = stream.getReader();
+    const decoder = new TextDecoder();
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      const chunk = decoder.decode(value);
+      const lines = chunk.split('\n');
+
+      for (const line of lines) {
+        if (!line.trim()) continue;
+
+        if (line.startsWith('data: ')) {
+          try {
+            const data = JSON.parse(line.slice(6));
+            if (data.text) {
+              onChunk(data.text);
+            }
+          } catch (e) {
+            console.warn('Failed to parse SSE data:', e);
+          }
+        } else if (line.startsWith('event: end')) {
+          onComplete?.();
+          break;
+        } else if (line.startsWith('event: error')) {
+          try {
+            const data = JSON.parse(line.split('data: ')[1]);
+            onError?.(data.error || 'Unknown error');
+          } catch (e) {
+            onError?.('Failed to parse error message');
+          }
+          break;
+        }
+      }
+    }
+  } catch (err) {
+    onError?.(err instanceof Error ? err.message : 'Unknown error');
   }
 }

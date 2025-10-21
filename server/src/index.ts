@@ -5,15 +5,14 @@ import router from './routes.ts';
 import pool from './db.ts';
 import { createExpressEndpoints } from '@ts-rest/express';
 import { contract } from '@student-assistant/shared';
-// import redisRateLimiter from './redisRateLimiter.ts';
+import {rateLimiterMiddleware} from './redisRateLimiter.ts';
 
 dotenv.config();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
-// Apply Redis-backed rate limiter globally
-// app.use(redisRateLimiter);
+app.use(rateLimiterMiddleware);
 
 createExpressEndpoints(contract, router, app);
 
