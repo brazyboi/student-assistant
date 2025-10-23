@@ -137,33 +137,11 @@ export const router = s.router(contract, {
             // Set headers for SSE
             headers: {
                 'Content-Type': 'text/plain',
-                // 'Cache-Control': 'no-cache',
+                'Cache-Control': 'no-cache',
                 'Access-Control-Allow-Origin': 'http://localhost:5173',
                 'Access-Control-Allow-Credentials': 'true',
             },
-            // Return a ReadableStream that emits chunks
             body: reader,
-            // body: {
-            //     "hello": "what"
-            // },
-            // new ReadableStream({
-            //     async start(controller) {
-            //         try {
-            //             await getAIFeedbackStream(problem, user_attempt, (chunk) => {
-            //                 // Push each chunk as an SSE event
-            //                 controller.enqueue(`data: ${JSON.stringify({ text: chunk })}\n\n`);
-            //                 console.log('data', chunk);
-            //             });
-
-            //             // Signal end of stream
-            //             controller.enqueue('event: end\ndata: {}\n\n');
-            //             controller.close();
-            //         } catch (err) {
-            //             console.error("Streaming error:", err);
-            //             controller.enqueue(`event: error\ndata: ${JSON.stringify({ error: "AI error" })}\n\n`);
-            //             controller.close();
-            //         }
-            //     }
         };
     },
 });

@@ -87,90 +87,27 @@ export async function streamAttemptFeedback(
   if (res.status !== 200) throw new Error(`Stream request failed: ${res.status}`);
   if (!res.body) throw new Error('Response body is empty; streaming unsupported in this environment');
 
-  // const reader = res.body.getReader();
-  // console.log(reader);
-  // const decoder = new TextDecoder();
-  // let buffer = '';
-
-  // while (true) {
-  //   const { done, value } = await reader.read();
-  //   if (done) break;
-  //   console.log(decoder.decode(value, {stream: true}));
-  // }
-
-  console.log(res.body);
   const reader = res.body.getReader();
   const decoder = new TextDecoder();
   let buffer = "";
 
   while (true) {
     const { done, value } = await reader.read();
-    console.log(value);
     if (done) break;
 
     buffer += decoder.decode(value, { stream: true });
-    console.log(buffer);
 
     let events = buffer.split("\n\n");
     buffer = events.pop()!;
+    onChunk(buffer);
 
-    for (const event of events) {
-      if (event.startsWith("data:")) {
-        const data = JSON.parse(event.slice(5));
-        console.log("Chunk:", data.text);
-      }
-    }
+    // for (const event of events) {
+    //   if (event.startsWith("data:")) {
+    //     const data = JSON.parse(event.slice(5));
+    //     console.log("Chunk:", data.text);
+    //   }
+    // }
   }
-
-  // try {
-  //   while (true) {
-  //     const { done, value } = await reader.read();
-  //     if (done) break;
-
-  //     buffer += decoder.decode(value, { stream: true });
-
-  //     // Process complete SSE events separated by double newline
-  //     let idx;
-  //     while ((idx = buffer.indexOf('\n\n')) !== -1) {
-  //       const event = buffer.slice(0, idx);
-  //       buffer = buffer.slice(idx + 2);
-
-  //       // Each event can have multiple lines; we only care about 'data:' lines
-  //       const lines = event.split('\n');
-  //       for (const line of lines) {
-  //         if (line.startsWith('data:')) {
-  //           const payload = line.replace(/^data:\s?/, '');
-  //           try {
-  //             const parsed = JSON.parse(payload);
-  //             if (parsed && typeof parsed.text === 'string') {
-  //               onChunk(parsed.text);
-  //             }
-  //           } catch (e) {
-  //             console.warn('[streamAttemptFeedback] failed to parse data payload', payload, e);
-  //           }
-  //         }
-  //       }
-  //     }
-  //   }
-
-  //   // If there's remaining buffered data after stream end, try to process it
-  //   if (buffer.trim()) {
-  //     const lines = buffer.split('\n');
-  //     for (const line of lines) {
-  //       if (line.startsWith('data:')) {
-  //         const payload = line.replace(/^data:\s?/, '');
-  //         try {
-  //           const parsed = JSON.parse(payload);
-  //           if (parsed && typeof parsed.text === 'string') onChunk(parsed.text);
-  //         } catch (e) {
-  //           console.warn('[streamAttemptFeedback] leftover parse failed', e);
-  //         }
-  //       }
-  //     }
-  //   }
-  // } finally {
-  //   try { await reader.cancel(); } catch (_) {}
-  // }
 }
 
 export default client;

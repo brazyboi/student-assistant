@@ -4,7 +4,7 @@ import { useChats, useActiveUser } from '@/lib/state';
 
 export function useChatActions() {
   const activeUser = useActiveUser((s) => s.activeUser);
-  const { chats, addChat, setChats, updateChatMessages, selectedChatId, setSelectedChatId, loadingAiFeedback, setLoadingAiFeedback } = useChats();
+  const { chats, addChat, setChats, updateChatMessages, selectedChatId, setSelectedChatId, loadingAiFeedback, setLoadingAiFeedback, appendToLastMessage } = useChats();
 
   const selectedChat = chats.find((c) => c.id === selectedChatId);
 
@@ -74,7 +74,7 @@ export function useChatActions() {
     
     try {
       const result = await streamAttemptFeedback(selectedChat.id, text, (chunk) => {
-        console.log("Chunk", chunk);
+        appendToLastMessage(selectedChat.id, chunk);
       });
       let aiFeedback = "";
 
