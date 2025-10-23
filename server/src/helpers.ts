@@ -77,16 +77,16 @@ Only ever give incremental help on the problem, do not give them the full soluti
     `;
 
     try {
-        // const stream = await openai.responses.create({
-        //     model: "gpt-4o-mini",
-        //     input: [
-        //         {
-        //             role: "user",
-        //             content: prompt,
-        //         }
-        //     ],
-        //     stream: true
-        // });
+        const stream = await openai.responses.create({
+            model: "gpt-4o-mini",
+            input: [
+                {
+                    role: "user",
+                    content: prompt,
+                }
+            ],
+            stream: true
+        });
         
         // for await (const event of stream) {
         //     switch (event.type) {
@@ -101,14 +101,25 @@ Only ever give incremental help on the problem, do not give them the full soluti
         //     }
 
         // }
-        const chunks = ["Hello", "world", "this", "is", "streaming"];
+        // const chunks = ["Hello", "world", "this", "is", "streaming"];
 
         const readable = new ReadableStream({
             async start(controller) {
                 try { 
-                    for (const chunk of chunks) {
-                        controller.enqueue(new TextEncoder().encode(chunk));
-                        await new Promise(res => setTimeout(res, 100)); // optional, simulate delay
+                    // for (const chunk of chunks) {
+                    //     controller.enqueue(new TextEncoder().encode(chunk));
+                    //     await new Promise(res => setTimeout(res, 100)); // optional, simulate delay
+                    // }
+                    for await (const event of stream) {
+                        switch (event.type) {
+                            case "response.output_text.delta":
+                                const content = event.delta || "";
+                                const sseChunk = `data:${content}\n\n`
+                                controller.enqueue(new TextEncoder().encode(sseChunk));
+                                break;
+                            default:
+                                break;
+                        }
                     }
                 } catch (err) {
                     controller.error(err);

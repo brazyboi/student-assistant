@@ -95,18 +95,14 @@ export async function streamAttemptFeedback(
     const { done, value } = await reader.read();
     if (done) break;
 
-    buffer += decoder.decode(value, { stream: true });
+    buffer = decoder.decode(value, { stream: true });
 
     let events = buffer.split("\n\n");
-    buffer = events.pop()!;
-    onChunk(buffer);
 
-    // for (const event of events) {
-    //   if (event.startsWith("data:")) {
-    //     const data = JSON.parse(event.slice(5));
-    //     console.log("Chunk:", data.text);
-    //   }
-    // }
+    for (const event of events) {
+      const data = event.slice(5);
+      onChunk(data);
+    }
   }
 }
 
