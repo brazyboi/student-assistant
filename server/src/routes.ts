@@ -1,6 +1,6 @@
 import { contract } from "@student-assistant/shared";
-import pool from "./db.ts";
-import { getAIFeedback, getAIFeedbackStream, getUserIdFromToken } from "./helpers.ts";
+import pool from "./db.js";
+import { getAIFeedback, getAIFeedbackStream, getUserIdFromToken } from "./helpers.js";
 import { initServer } from "@ts-rest/express";
 import { Response } from "node-fetch";
 

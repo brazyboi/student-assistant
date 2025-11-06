@@ -1,15 +1,40 @@
 import { createClient } from "@supabase/supabase-js";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import OpenAI from "openai";
 import dotenv from 'dotenv';
 
 dotenv.config();
 
-const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+let supabase: SupabaseClient;
 
-const openai = new OpenAI({apiKey: process.env.OPENAI_API_KEY});
+export function getSupabaseClient() {
+  if (!supabase) {
+    const supabaseUrl = process.env.SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_ANON_KEY;
+    
+    if (!supabaseUrl || !supabaseKey) {
+      throw new Error('Missing SUPABASE_URL or SUPABASE_ANON_KEY environment variables');
+    }
+    
+    supabase = createClient(supabaseUrl, supabaseKey);
+  }
+  return supabase;
+}
+
+let openai : OpenAI
+
+export function getOpenAIClient() {
+    if (!openai) {
+        const apiKey = process.env.OPENAI_API_KEY;
+
+        if (!apiKey) {
+            throw new Error('Missing OPENAI_API_KEY env');
+        }
+
+        openai = new OpenAI({ apiKey });
+    }
+    return openai;
+}
 
 // Get the user ID from the JWT
 export async function getUserIdFromToken(authHeader?: string) {
@@ -18,6 +43,7 @@ export async function getUserIdFromToken(authHeader?: string) {
     }
 
     const token = authHeader.replace("Bearer ", "");
+    const supabase = getSupabaseClient();
 
     const { data, error } = await supabase.auth.getUser(token);
     if (error || !data.user) throw new Error("Invalid token.");
@@ -32,7 +58,8 @@ export async function getAIFeedback(problem: string, user_attempt: string) {
         `;
 
     try {
-        const ai_response = await openai.chat.completions.create({
+        const openaiClient = getOpenAIClient();
+        const ai_response = await openaiClient.chat.completions.create({
             model: "gpt-4o-mini",
             messages: [
                 {
@@ -77,7 +104,8 @@ Only ever give incremental help on the problem, do not give them the full soluti
     `;
 
     try {
-        const stream = await openai.responses.create({
+        const openaiClient = getOpenAIClient();
+        const stream = await openaiClient.responses.create({
             model: "gpt-4o-mini",
             input: [
                 {

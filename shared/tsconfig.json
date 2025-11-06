@@ -4,12 +4,16 @@
     "module": "ESNext",
     "declaration": true,
     "declarationMap": true,
-    "outDir": "dist",
-    "rootDir": "src",
+    "outDir": "./dist",
+    "rootDir": "./src",
     "strict": true,
     "esModuleInterop": true,
-    "moduleResolution": "node",
-    "composite": true
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "composite": true,
+    "sourceMap": true,
+    "isolatedModules": true
   },
-  "include": ["src"]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
 }

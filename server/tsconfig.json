@@ -4,7 +4,7 @@
     "outDir": "./dist",
     "module": "ESNext",
     "target": "ES2022",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "types": ["node"],
@@ -12,15 +12,16 @@
     "declaration": true,
     "declarationMap": true,
     "strict": true,
-    "jsx": "react-jsx",
     "baseUrl": "./src",
     "paths": {
       "@student-assistant/shared": ["../shared/src"]
     },
-    "noEmit": true,
-    "allowImportingTsExtensions": true,
     "isolatedModules": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "allowJs": false,
+    "verbatimModuleSyntax": true,
   },
-  "include": ["src"]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
 }
