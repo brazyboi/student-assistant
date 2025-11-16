@@ -3,8 +3,8 @@ import Redis from 'ioredis';
 import { RateLimiterRedis } from 'rate-limiter-flexible';
 
 const redisClient = new Redis({
-  host: "localhost",
-  port: 6379,
+  host: process.env.REDIS_HOST || "127.0.0.1",
+  port: parseInt(process.env.REDIS_PORT || "6379"),
   retryStrategy(times) {
       const delay = Math.min(times * 200, 2000);
       return delay;
@@ -22,18 +22,18 @@ redisClient.on('error', (err) => {
 
 const rateLimiterRedis = new RateLimiterRedis({
   storeClient: redisClient,
-  points: 5,
-  duration: 5,
+  points: 100,
+  duration: 60,
   blockDuration: 0,
   execEvenly: true,
   keyPrefix: 'middleware',
-})
+});
 
 export const rateLimiterMiddleware = async (req: Request, res: Response, next: NextFunction) => {
   try {
     await rateLimiterRedis.consume(req.ip!);
     next();
   } catch {
-    res.status(429).send("Too many requests.")
+    res.status(429).send("Too many requests.");
   }
-}
+};
