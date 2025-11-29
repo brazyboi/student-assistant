@@ -1,11 +1,37 @@
-node_modules
-npm-debug.log
+# Environment files - NEVER include in image
+.env
+.env.local
+.env.*.local
+docker.env
+.env.production
+
+# Git
 .git
 .gitignore
-*.md
+
+# Node
+node_modules
+npm-debug.log
+yarn-error.log
+
+# IDE
 .vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts (we use multi-stage, but just in case)
 dist
 build
-.cache
+
+# Testing
 coverage
-.DS_Store
+.nyc_output
+
+# Logs
+logs
+*.log

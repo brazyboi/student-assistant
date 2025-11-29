@@ -1,4 +1,4 @@
-# Build stage
+# Build stage - NO secrets passed here
 FROM node:20-alpine AS builder
 
 WORKDIR /app
@@ -23,7 +23,7 @@ COPY server/tsconfig.json ./server/
 COPY client/tsconfig*.json ./client/
 COPY client/vite.config.ts ./client/
 
-# Build everything in order
+# Build everything in order - NO environment variables needed for build
 RUN npm run build:shared
 RUN npm run build:server
 RUN npm run build:client
@@ -49,14 +49,11 @@ COPY --from=builder /app/client/dist ./client/dist
 # Copy shared package.json for module resolution
 COPY --from=builder /app/shared/package.json ./shared/
 
-# Copy server .env file (or use docker env vars instead)
-# COPY server/.env ./server/.env
+# Set production environment
+ENV NODE_ENV=production
 
 # Expose port
 EXPOSE 3000
 
-# Set production environment
-ENV NODE_ENV=production
-
-# Start the server
+# Start the server - secrets come from runtime env vars via --env-file
 CMD ["node", "server/dist/index.js"]
