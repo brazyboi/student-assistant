@@ -20,7 +20,7 @@ export default function ChatMessage({text, sender} : MessageProps) {
       >
         <Card
           className={cn(
-            "max-w-[75%] w-fit px-4 py-2 rounded-xl border-2 border-secondary break-words whitespace-pre-wrap overflow-hidden",
+            "max-w-[75%] w-fit px-4 py-2 rounded-xl border-2 border-secondary break-words overflow-hidden",
             sender === "user"
               ? "bg-secondary/50"
               : ""
