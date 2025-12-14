@@ -2,7 +2,7 @@ import { supabase } from "../lib/supabaseClient";
 import { initClient } from "@ts-rest/core";
 import { contract } from '@student-assistant/shared';
 
-const API_BASE = "http://localhost:3000";
+const API_BASE = import.meta.env.VITE_API_URL;
 
 const client = initClient(contract, {
   baseUrl: `${API_BASE}`,
@@ -67,7 +67,7 @@ export async function getAttempts(session_id: number) {
 
 // Minimal SSE reader that consumes the server ReadableStream and invokes onChunk(text)
 export async function streamAttemptFeedback(
-  session_id: number,
+  session_id: number | string,
   user_attempt: string,
   onChunk: (chunk: string) => void,
 ) {

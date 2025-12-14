@@ -2,6 +2,16 @@ import { startSession, addAttempt, streamAttemptFeedback } from '@/api/chat';
 import type { Chat } from '@/lib/types';
 import { useChats, useActiveUser } from '@/lib/state';
 
+function generateUUID() {
+  if (typeof self !== 'undefined' && self.crypto && self.crypto.randomUUID) {
+    return self.crypto.randomUUID();
+  }
+  
+  return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, c =>
+    (+c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> +c / 4).toString(16)
+  );
+}
+
 export function useChatActions() {
   const activeUser = useActiveUser((s) => s.activeUser);
   const { chats, addChat, setChats, updateChatMessages, selectedChatId, setSelectedChatId, loadingAiFeedback, setLoadingAiFeedback, appendToLastMessage } = useChats();
@@ -14,7 +24,7 @@ export function useChatActions() {
     
     const problemTitle = problem.length > 40 ? problem.slice(0, 37) + "..." : problem
 
-    const tempId = Date.now();
+    const tempId = generateUUID();
     const tempSession: Chat = {
       id: tempId,
       title: problemTitle,

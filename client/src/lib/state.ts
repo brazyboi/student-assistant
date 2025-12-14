@@ -13,10 +13,10 @@ interface ChatsState {
     addChat: (chat: Chat) => void,
     setChats: (chats: Chat[]) => void,
 
-    selectedChatId: number | null, 
-    setSelectedChatId: (id: number | null) => void,
-    updateChatMessages: (chatId: number | null, messages: Message[]) => void,
-    appendToLastMessage: (chatId: number | null, chunk: string) => void,
+    selectedChatId: number | string | null, 
+    setSelectedChatId: (id: number | string | null) => void,
+    updateChatMessages: (chatId: number | string | null, messages: Message[]) => void,
+    appendToLastMessage: (chatId: number | string | null, chunk: string) => void,
 
     loadingAiFeedback: boolean,
     setLoadingAiFeedback: (loading: boolean) => void,
@@ -37,8 +37,8 @@ export const useChats = create<ChatsState>((set) => ({
     setChats: (chats: Chat[]) => set({chats}),
 
     selectedChatId: null,
-    setSelectedChatId: (id: number | null) => set(({ selectedChatId: id })),
-    updateChatMessages: (chatId: number | null, messages: Message[]) => 
+    setSelectedChatId: (id: number | string | null) => set(({ selectedChatId: id })),
+    updateChatMessages: (chatId: number | string | null, messages: Message[]) => 
         set((state) => {
             if (chatId == null) return state;
             return {
@@ -51,7 +51,7 @@ export const useChats = create<ChatsState>((set) => ({
         }),
     
     // For streaming: update the last AI message with new chunks
-    appendToLastMessage: (chatId: number | null, chunk: string) =>
+    appendToLastMessage: (chatId: number | string | null, chunk: string) =>
         set((state) => {
             if (chatId == null) return state;
             const chat = state.chats.find(c => c.id === chatId);
