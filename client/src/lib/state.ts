@@ -5,7 +5,9 @@ const MESSAGE_COOLDOWN_MS = 1500;
 
 interface UserState {
     activeUser: Profile | null,
+    isLoading: boolean;
     setActiveUser: (profile: Profile | null) => void,
+    setIsLoading: (loading: boolean) => void
 }
 
 interface ChatsState {
@@ -28,7 +30,9 @@ interface ChatsState {
 
 export const useActiveUser = create<UserState>((set) => ({
     activeUser: null,
+    isLoading: true,
     setActiveUser: (profile: Profile | null) => set({ activeUser: profile }),
+    setIsLoading: (loading: boolean) => set({isLoading: loading})
 }));
 
 export const useChats = create<ChatsState>((set) => ({

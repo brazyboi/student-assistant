@@ -5,6 +5,7 @@ import { useActiveUser } from '@/lib/state';
 
 export function useAuthSession() {
   const setActiveUser = useActiveUser((s) => s.setActiveUser);
+  const setIsLoading = useActiveUser((s) => s.setIsLoading);
 
   useEffect(() => {
     const getSession = async () => {
@@ -12,6 +13,8 @@ export function useAuthSession() {
       if (data.session?.user) {
         setActiveUser({ id: data.session.user.id, email: data.session.user.email } as Profile);
       }
+
+      setIsLoading(false);
     };
 
     getSession();
@@ -24,8 +27,9 @@ export function useAuthSession() {
       } else {
         setActiveUser(null);
       }
+      setIsLoading(false);
     });
 
     return () => subscription.unsubscribe();
-  }, [setActiveUser]);
+  }, [setActiveUser, setIsLoading]);
 }
