@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/lib/supabaseClient";
 import { Icon } from "@iconify/react";
 
@@ -22,13 +23,19 @@ export default function LoginPage() {
 
   return (
     <div className="flex flex-col h-screen items-center justify-center">
-      <h1>Log In</h1> 
-      <div className='mt-2 grid gap-2 grid-cols-1'>
-          <Button variant='outline' size='lg' className='cursor-pointer border-2' onClick={handleSignInGoogle}>
+      <h2>Student Assistant</h2>
+      <Card className="mt-2 w-full max-w-sm">
+        <CardHeader>
+          <CardTitle>Login</CardTitle>
+          <CardDescription>Only sign-in with Google is allowed at this time.</CardDescription>
+        </CardHeader>
+        <CardFooter>
+          <Button variant='outline' size='lg' className='w-full cursor-pointer border-2' onClick={handleSignInGoogle}>
             <Icon icon="logos:google-icon"/>
             Google
           </Button>
-        </div>
+        </CardFooter>
+      </Card>
     </div>
   );
 }
