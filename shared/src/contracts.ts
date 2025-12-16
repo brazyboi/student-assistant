@@ -80,5 +80,21 @@ export const contract = c.router({
             // 200: z.string()
         },
         summary: "Streams the AI feedback message in chunks in real time.",
-    }
+    },
+    addNote: {
+        method: 'POST',
+        path: '/notes',
+        body: z.object({
+        content: z.string(),
+        }),
+        responses: {
+        200: z.object({
+            success: z.boolean(),
+            message: z.string(),
+        }),
+        401: z.object({ error: z.string() }), // Unauthorized
+        500: z.object({ error: z.string() }),
+        },
+        summary: 'Upload a personal note to the Knowledge Base',
+    },
 });

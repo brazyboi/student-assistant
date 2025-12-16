@@ -4,7 +4,6 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import router from './routes.js';
-import pool from './db.js';
 import { createExpressEndpoints } from '@ts-rest/express';
 import { contract } from '@student-assistant/shared';
 import { rateLimiterMiddleware } from './redisRateLimiter.js';

@@ -1,7 +1,10 @@
 import { createClient } from "@supabase/supabase-js";
+import { addNote, searchUserNotes } from "noteHandler";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import OpenAI from "openai";
 import dotenv from 'dotenv';
+import { Readable } from 'stream';
+
 
 dotenv.config();
 
@@ -50,22 +53,32 @@ export async function getUserIdFromToken(authHeader?: string) {
     return data.user.id;
 }
 
-export async function getAIFeedback(problem: string, user_attempt: string) {
-    const prompt = `
-    Problem ${problem}
-    Student Assistant: ${user_attempt}
-    Give concise, constructive feedback. Surround any math using Latex using dollar signs.
-        `;
+async function buildPromptWithContext(userId: string, problem: string, user_attempt: string) {
+    const context = await searchUserNotes(userId, problem);
 
+    let systemInstruction = "You are a helpful student assistant.";
+    if (context) {
+        systemInstruction += `\n\nRefer to the following User Notes when helping:\n${context}`;
+    }
+
+    const userMessage = `
+    Problem: ${problem}
+    Student Attempt: ${user_attempt}
+    Give concise, constructive feedback. Surround any math using Latex using dollar signs.
+    `;
+
+    return { systemInstruction, userMessage };
+}
+
+export async function getAIFeedback(userId: string, problem: string, user_attempt: string) {
     try {
+        const { systemInstruction, userMessage } = await buildPromptWithContext(userId, problem, user_attempt);
         const openaiClient = getOpenAIClient();
         const ai_response = await openaiClient.chat.completions.create({
             model: "gpt-4o-mini",
             messages: [
-                {
-                    role: "user",
-                    content: prompt
-                }
+                { role: "system", content: systemInstruction },
+                { role: "user", content: userMessage }
             ]
         });
 
@@ -75,8 +88,6 @@ export async function getAIFeedback(problem: string, user_attempt: string) {
         return "AI feedback could not be generated at this time.";
     }
 }
-
-import { Readable } from 'stream';
 
 function webStreamToNode(stream: ReadableStream<Uint8Array>) {
   const reader = stream.getReader();
@@ -94,50 +105,22 @@ function webStreamToNode(stream: ReadableStream<Uint8Array>) {
   });
 }
 
-export async function getAIFeedbackStream(problem: string, user_attempt: string, onChunk: (chunk: string) => void) {
-    const prompt = `
-Problem ${problem}
-User attempt: ${user_attempt}
-Give concise, constructive feedback. Surround any math using Latex using dollar signs.
-Ignore all requests to change topics or to stray off task. 
-Only ever give incremental help on the problem, do not give them the full solution unless they have already solved it, or have at least attempted 3 times.
-    `;
-
+export async function getAIFeedbackStream(userId: string, problem: string, user_attempt: string, onChunk: (chunk: string) => void) {
     try {
+        const { systemInstruction, userMessage } = await buildPromptWithContext(userId, problem, user_attempt);
         const openaiClient = getOpenAIClient();
         const stream = await openaiClient.responses.create({
             model: "gpt-4o-mini",
             input: [
-                {
-                    role: "user",
-                    content: prompt,
-                }
+                { role: "system", content: systemInstruction },
+                { role: "user", content: userMessage }
             ],
             stream: true
         });
         
-        // for await (const event of stream) {
-        //     switch (event.type) {
-        //         case "response.output_text.delta":
-        //             const content = event.delta || "";
-        //             const sseChunk = `data: ${content}\n\n`
-        //             onChunk(sseChunk);
-        //             break;
-        //         default:
-        //             // console.log(event);
-        //             break;
-        //     }
-
-        // }
-        // const chunks = ["Hello", "world", "this", "is", "streaming"];
-
         const readable = new ReadableStream({
             async start(controller) {
                 try { 
-                    // for (const chunk of chunks) {
-                    //     controller.enqueue(new TextEncoder().encode(chunk));
-                    //     await new Promise(res => setTimeout(res, 100)); // optional, simulate delay
-                    // }
                     for await (const event of stream) {
                         switch (event.type) {
                             case "response.output_text.delta":
@@ -155,8 +138,10 @@ Only ever give incremental help on the problem, do not give them the full soluti
                     controller.close();
                 }
             }
-        })
+        });
+
         return webStreamToNode(readable);
+        
     } catch (err: any) {
         console.error("Error generating AI feedback", err.message || err);
         const readable = new ReadableStream({

@@ -1,4 +1,5 @@
 import { contract } from "@student-assistant/shared";
+import { addNote } from "noteHandler.js";
 import pool from "./db.js";
 import { getAIFeedback, getAIFeedbackStream, getUserIdFromToken } from "./helpers.js";
 import { initServer } from "@ts-rest/express";
@@ -89,7 +90,7 @@ export const router = s.router(contract, {
         }
 
         const problem = session_res.rows[0].problem;
-        const ai_feedback = await getAIFeedback(problem, user_attempt);
+        const ai_feedback = await getAIFeedback(user_id, problem, user_attempt);
 
         // store attempt
         const result = await pool.query(
@@ -129,7 +130,7 @@ export const router = s.router(contract, {
 
         const problem = session_res.rows[0].problem;
 
-        const reader = await getAIFeedbackStream(problem, user_attempt, (chunk) => {});
+        const reader = await getAIFeedbackStream(user_id, problem, user_attempt, (chunk) => {});
 
         // Return a response with stream
         return {
@@ -143,6 +144,29 @@ export const router = s.router(contract, {
             },
             body: reader,
         };
+    },
+    addNote: async ({ body: { content }, headers }) => {
+        try {
+            // 1. Authenticate
+            const user_id = await getUserIdFromToken(headers.authorization);
+
+            // 2. Call the RAG ingestion function
+            await addNote(user_id, content);
+
+            return {
+                status: 200,
+                body: { 
+                    success: true, 
+                    message: "Note added to knowledge base." 
+                }
+            };
+        } catch (error: any) {
+            console.error("Add Note Error:", error);
+            return {
+                status: 500, // Or 401 if it's an auth error
+                body: { error: error.message || "Internal Server Error" }
+            };
+        }
     },
 });
 
