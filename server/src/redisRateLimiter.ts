@@ -22,14 +22,18 @@ redisClient.on('error', (err) => {
 
 const rateLimiterRedis = new RateLimiterRedis({
   storeClient: redisClient,
-  points: 100,
-  duration: 60,
+  points: 50,
+  duration: 10,
   blockDuration: 0,
-  execEvenly: true,
-  keyPrefix: 'middleware',
+  execEvenly: false,
+  keyPrefix: 'middleware_v2',
 });
 
 export const rateLimiterMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+  if (req.path === '/api/upload-pdf') {
+      return next();
+  }
+
   try {
     await rateLimiterRedis.consume(req.ip!);
     next();
