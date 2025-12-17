@@ -38,9 +38,27 @@ app.use(cors({
 app.use(express.json());
 app.use(rateLimiterMiddleware);
 
-const upload = multer({ storage: multer.memoryStorage() });
+const MAX_SIZE = 10 * 1024 * 1024; // 10 MB
+const upload = multer({ 
+  storage: multer.memoryStorage(),
+  limits: { fileSize: MAX_SIZE }
+});
 app.post('/api/upload-pdf', upload.single('file'), async (req, res) => {
-    try {
+    const uploadMiddleware = upload.single('file');
+
+    uploadMiddleware(req, res, async (err) => {
+      // 1. Catch Multer Errors (Size Limit, etc.)
+      if (err instanceof multer.MulterError) {
+          if (err.code === 'LIMIT_FILE_SIZE') {
+              return res.status(400).json({ error: "File is too large. Max limit is 10MB." });
+          }
+          return res.status(400).json({ error: err.message });
+      } else if (err) {
+          // Catch unknown errors
+          return res.status(500).json({ error: "Unknown upload error." });
+      }
+
+      try {
         const userId = await getUserIdFromToken(req.headers.authorization);
         
         if (!req.file) return res.status(400).json({ error: "No file uploaded" });
@@ -50,14 +68,10 @@ app.post('/api/upload-pdf', upload.single('file'), async (req, res) => {
         
         console.log(`Processing ${chunks.length} chunks for user ${userId}...`);
 
-        // --- FIX: SEQUENTIAL UPLOAD ---
-        // We use a simple for-loop to wait for one to finish before starting the next.
-        // It's slower, but it won't crash your server or get you banned by OpenAI.
         let savedCount = 0;
         for (const chunk of chunks) {
             await addNote(userId, chunk);
             savedCount++;
-            // Optional: Add a tiny delay to be polite to OpenAI
             await new Promise(r => setTimeout(r, 100)); 
         }
         // ------------------------------
@@ -72,6 +86,7 @@ app.post('/api/upload-pdf', upload.single('file'), async (req, res) => {
         // Ensure we send JSON even on error
         res.status(500).json({ error: err.message || "Internal Server Error" });
     }
+  });
 });
 
 // API routes via ts-rest

@@ -3,6 +3,8 @@ import { supabase } from '@/lib/supabaseClient';
 import { Button } from '@/components/ui/button';
 import { Upload } from 'lucide-react';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
 export function PdfUpload() {
   const [uploadStatus, setStatus] = useState<'idle' | 'uploading' | 'success' | 'error'>('idle');
 
@@ -10,8 +12,13 @@ export function PdfUpload() {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    const MAX_MB = 10;
+    if (file.size > MAX_MB * 1024 * 1024) {
+        setStatus('error');
+        return; // Stop here, don't upload
+    }
+
     setStatus('uploading');
-    setMessage('Reading PDF and generating embeddings...');
 
     try {
       const { data: session } = await supabase.auth.getSession(); 
@@ -24,7 +31,7 @@ export function PdfUpload() {
       const formData = new FormData();
       formData.append('file', file);
 
-      const response = await fetch('http://localhost:3000/api/upload-pdf', {
+      const response = await fetch('${API_URL}/api/upload-pdf', {
         method: 'POST',
         headers: {
             'Authorization': `Bearer ${token}`
@@ -39,12 +46,10 @@ export function PdfUpload() {
 
       const data = await response.json();
       setStatus('success');
-      setMessage(data.message);
 
     } catch (err: any) {
       console.error(err);
       setStatus('error');
-      setMessage(err.message || "Failed to upload");
     }
   };
 
@@ -73,7 +78,7 @@ export function PdfUpload() {
             <div className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full"></div>
           )}
           {uploadStatus === 'idle' && <Upload className="w-4 h-4" />}
-          {uploadStatus === 'idle' && 'Upload PDF'}
+          {uploadStatus === 'idle' && 'Upload PDF (MAX 10MB)'}
           {uploadStatus === 'uploading' && 'Uploading...'}
           {uploadStatus === 'success' && '✓ Uploaded'}
           {uploadStatus === 'error' && '⚠ Failed'}
