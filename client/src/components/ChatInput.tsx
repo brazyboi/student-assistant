@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea'
 import { Send } from 'lucide-react';
 import { useChats } from '@/lib/state';
+import { PdfUpload } from '@/components/PdfUploadButton';
 
 export default function ChatInput({ onSend }: { onSend: (message: string) => void }) {
     const [message, setMessage] = React.useState('');
@@ -45,29 +46,34 @@ export default function ChatInput({ onSend }: { onSend: (message: string) => voi
     };
 
     return (
-        <form 
-            onSubmit={handleSubmit} 
-            className="relative mb-4 justify-center w-full"
-        >
-            <Textarea
-                ref={textareaRef}
-                rows={1}
-                onInput={handleInput}
-                onKeyDown={handleKeyDown}
-                placeholder={placeholderText}
-                className="resize-none overflow-hidden break-words whitespace-pre-wrap break-all pr-12 border-2 border-secondary"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                autoComplete='off'
-                autoFocus
-            />
-            <Button 
-                type='submit'
-                size='icon'
-                className='absolute rounded-full bottom-2 right-2 h-8 w-8 cursor-pointer'
+        <>
+            <div className="mb-4">
+                <PdfUpload />
+            </div>
+            <form 
+                onSubmit={handleSubmit} 
+                className="relative mb-4 justify-center w-full flex gap-2"
             >
-                <Send className="self-center"/>
-            </Button>
-        </form>
+                <Textarea
+                    ref={textareaRef}
+                    rows={1}
+                    onInput={handleInput}
+                    onKeyDown={handleKeyDown}
+                    placeholder={placeholderText}
+                    className="resize-none overflow-hidden break-words whitespace-pre-wrap break-all pr-12 border-2 border-secondary flex-1"
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    autoComplete='off'
+                    autoFocus
+                />
+                <Button 
+                    type='submit'
+                    size='icon'
+                    className='rounded-full h-8 w-8 cursor-pointer'
+                >
+                    <Send className="self-center"/>
+                </Button>
+            </form>
+        </>
     )
 }
