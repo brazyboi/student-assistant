@@ -11,7 +11,7 @@ import { rateLimiterMiddleware } from './redisRateLimiter.js';
 import multer from 'multer';
 import { extractTextFromPDF, chunkText } from './pdfUtils.js';
 import { getUserIdFromToken } from './helpers.js'; // Import your existing helpers
-import { addNote } from 'noteHandler.js';
+import { addNote } from './noteHandler.js';
 
 // Get __dirname equivalent in ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -27,9 +27,18 @@ const app = express();
 // SERVE STATIC CLIENT FILES (Production only)
 // ========================================
 const isProduction = process.env.NODE_ENV === 'production';
+const allowedOrigins = isProduction 
+  ? (process.env.ALLOWED_ORIGINS || '').split(',').map(o => o.trim())
+  : ['http://localhost:5173', 'http://localhost:3000'];
 
 app.use(cors({
-  origin: isProduction ? false : 'http://localhost:5173',
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']

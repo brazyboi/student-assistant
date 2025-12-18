@@ -1,5 +1,5 @@
 import { contract } from "@student-assistant/shared";
-import { addNote } from "noteHandler.js";
+import { addNote } from "./noteHandler.js";
 import pool from "./db.js";
 import { getAIFeedback, getAIFeedbackStream, getUserIdFromToken } from "./helpers.js";
 import { initServer } from "@ts-rest/express";
@@ -139,8 +139,6 @@ export const router = s.router(contract, {
             headers: {
                 'Content-Type': 'text/plain',
                 'Cache-Control': 'no-cache',
-                'Access-Control-Allow-Origin': 'http://localhost:5173',
-                'Access-Control-Allow-Credentials': 'true',
             },
             body: reader,
         };

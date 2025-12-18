@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import { addNote, searchUserNotes } from "noteHandler";
+import { addNote, searchUserNotes } from "./noteHandler.js";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import OpenAI from "openai";
 import dotenv from 'dotenv';
