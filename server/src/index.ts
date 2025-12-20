@@ -7,30 +7,24 @@ import router from './routes.js';
 import { createExpressEndpoints } from '@ts-rest/express';
 import { contract } from '@student-assistant/shared';
 import { rateLimiterMiddleware } from './redisRateLimiter.js';
-
 import multer from 'multer';
 import { extractTextFromPDF, chunkText } from './pdfUtils.js';
-import { getUserIdFromToken } from './helpers.js'; // Import your existing helpers
+import { getUserIdFromToken } from './helpers.js';
 import { addNote } from './noteHandler.js';
 
-// Get __dirname equivalent in ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// dotenv.config();
 dotenv.config({ path: path.join(__dirname, '../.env') });
-
 
 const app = express();
 
-// ========================================
-// SERVE STATIC CLIENT FILES (Production only)
-// ========================================
 const isProduction = process.env.NODE_ENV === 'production';
 const allowedOrigins = isProduction 
   ? (process.env.ALLOWED_ORIGINS || '').split(',').map(o => o.trim())
   : ['http://localhost:5173', 'http://localhost:3000'];
 
+// CORS Configuration
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin || allowedOrigins.includes(origin)) {
@@ -47,67 +41,62 @@ app.use(cors({
 app.use(express.json());
 app.use(rateLimiterMiddleware);
 
-const MAX_SIZE = 10 * 1024 * 1024; // 10 MB
+// Upload PDF route
+const MAX_SIZE = 10 * 1024 * 1024;
 const upload = multer({ 
   storage: multer.memoryStorage(),
   limits: { fileSize: MAX_SIZE }
 });
+
 app.post('/api/upload-pdf', upload.single('file'), async (req, res) => {
-    const uploadMiddleware = upload.single('file');
-
-    uploadMiddleware(req, res, async (err) => {
-      // 1. Catch Multer Errors (Size Limit, etc.)
-      if (err instanceof multer.MulterError) {
-          if (err.code === 'LIMIT_FILE_SIZE') {
-              return res.status(400).json({ error: "File is too large. Max limit is 10MB." });
-          }
-          return res.status(400).json({ error: err.message });
-      } else if (err) {
-          // Catch unknown errors
-          return res.status(500).json({ error: "Unknown upload error." });
-      }
-
-      try {
-        const userId = await getUserIdFromToken(req.headers.authorization);
-        
-        if (!req.file) return res.status(400).json({ error: "No file uploaded" });
-
-        const rawText = await extractTextFromPDF(req.file.buffer);
-        const chunks = chunkText(rawText);
-        
-        console.log(`Processing ${chunks.length} chunks for user ${userId}...`);
-
-        let savedCount = 0;
-        for (const chunk of chunks) {
-            await addNote(userId, chunk);
-            savedCount++;
-            await new Promise(r => setTimeout(r, 100)); 
-        }
-        // ------------------------------
-
-        res.json({ 
-            success: true, 
-            message: `Successfully processed PDF and added ${savedCount} chunks.` 
-        });
-
-    } catch (err: any) {
-        console.error("Upload failed:", err);
-        // Ensure we send JSON even on error
-        res.status(500).json({ error: err.message || "Internal Server Error" });
+  try {
+    const userId = await getUserIdFromToken(req.headers.authorization);
+    
+    if (!req.file) {
+      return res.status(400).json({ error: "No file uploaded" });
     }
-  });
+
+    const rawText = await extractTextFromPDF(req.file.buffer);
+    const chunks = chunkText(rawText);
+    
+    console.log(`Processing ${chunks.length} chunks for user ${userId}...`);
+
+    let savedCount = 0;
+    for (const chunk of chunks) {
+      await addNote(userId, chunk);
+      savedCount++;
+      await new Promise(r => setTimeout(r, 100)); 
+    }
+
+    res.json({ 
+      success: true, 
+      message: `Successfully processed PDF and added ${savedCount} chunks.` 
+    });
+
+  } catch (err: any) {
+    console.error("Upload failed:", err);
+    res.status(500).json({ error: err.message || "Internal Server Error" });
+  }
 });
 
-// API routes via ts-rest
+// Other API routes via ts-rest
 createExpressEndpoints(contract, router, app);
 
 if (isProduction) {
   const clientDistPath = path.join(__dirname, '../../client/dist');
   
-  // Serve static files (JS, CSS, images)
-  app.use(express.static(clientDistPath));
+  // Serve static files with proper MIME types
+  app.use(express.static(clientDistPath, {
+    setHeaders: (res, filePath) => {
+      if (filePath.endsWith('.css')) {
+        res.setHeader('Content-Type', 'text/css');
+      } else if (filePath.endsWith('.js')) {
+        res.setHeader('Content-Type', 'application/javascript');
+      }
+    }
+  }));
   
-  // SPA fallback - serve index.html for all non-API routes
+  // SPA fallback - MUST be absolute last route
   app.get('*', (req, res) => {
     res.sendFile(path.join(clientDistPath, 'index.html'));
   });
