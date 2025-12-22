@@ -80,28 +80,45 @@ export async function streamAttemptFeedback(
     headers: {
       "Content-Type": "application/json",
       "Authorization": `Bearer ${token}`,
-    }, 
-    body: JSON.stringify({user_attempt}),
-  })
+    },
+    body: JSON.stringify({ user_attempt }),
+  });
 
   if (res.status !== 200) throw new Error(`Stream request failed: ${res.status}`);
-  if (!res.body) throw new Error('Response body is empty; streaming unsupported in this environment');
+  if (!res.body) throw new Error('Response body is empty; streaming unsupported');
 
   const reader = res.body.getReader();
   const decoder = new TextDecoder();
-  let buffer = "";
+  let buffer = ""; // Buffer to hold incomplete chunks
 
   while (true) {
     const { done, value } = await reader.read();
     if (done) break;
 
-    buffer = decoder.decode(value, { stream: true });
+    // 1. APPEND to buffer, don't overwrite
+    buffer += decoder.decode(value, { stream: true });
 
-    let events = buffer.split("\n\n");
+    // 2. Split by the SSE delimiter
+    const parts = buffer.split("\n\n");
 
-    for (const event of events) {
-      const data = event.slice(5);
-      onChunk(data);
+    // 3. Keep the last part in the buffer (it might be incomplete)
+    //    pop() removes the last element from 'parts' and returns it
+    buffer = parts.pop() || "";
+
+    // 4. Process all complete messages
+    for (const part of parts) {
+      if (part.startsWith("data: ")) {
+        const jsonString = part.slice(6); // Remove "data: " prefix
+        try {
+          // Parse the JSON to safely extract text with newlines (\n) preserved
+          const parsed = JSON.parse(jsonString);
+          if (parsed.text) {
+             onChunk(parsed.text);
+          }
+        } catch (err) {
+          console.error("Error parsing SSE JSON:", err);
+        }
+      }
     }
   }
 }

@@ -56,15 +56,32 @@ export async function getUserIdFromToken(authHeader?: string) {
 async function buildPromptWithContext(userId: string, problem: string, user_attempt: string) {
     const context = await searchUserNotes(userId, problem);
 
-    let systemInstruction = "You are a helpful student assistant.";
+    // 1. Define the base persona and Strict Formatting rules here
+    let systemInstruction = `You are a helpful student assistant.
+    
+    CRITICAL FORMATTING RULES:
+    1. Math: ALWAYS surround math expressions with single dollar signs (e.g., $x^2$).
+    2. Code: Surround code with triple backticks.
+    3. Spacing: You must use a blank line before AND after every heading.
+       Example:
+       
+       [Previous paragraph]
+       
+       ### Heading Name
+       
+       [Next paragraph]
+    `;
+
     if (context) {
         systemInstruction += `\n\nRefer to the following User Notes when helping:\n${context}`;
     }
 
+    // 2. Keep the User message focused purely on the input data
     const userMessage = `
     Problem: ${problem}
     Student Attempt: ${user_attempt}
-    Give concise, constructive feedback. Surround any math using Latex using dollar signs.
+    
+    Task: Give concise, constructive feedback based on the attempt.
     `;
 
     return { systemInstruction, userMessage };
@@ -108,13 +125,13 @@ function webStreamToNode(stream: ReadableStream<Uint8Array>) {
 export async function getAIFeedbackStream(userId: string, problem: string, user_attempt: string, onChunk: (chunk: string) => void) {
     try {
         const { systemInstruction, userMessage } = await buildPromptWithContext(userId, problem, user_attempt);
+        console.log(systemInstruction);
+        console.log(userMessage);
         const openaiClient = getOpenAIClient();
         const stream = await openaiClient.responses.create({
             model: "gpt-4o-mini",
-            input: [
-                { role: "system", content: systemInstruction },
-                { role: "user", content: userMessage }
-            ],
+            instructions: systemInstruction,
+            input: userMessage,
             stream: true
         });
         
@@ -125,7 +142,7 @@ export async function getAIFeedbackStream(userId: string, problem: string, user_
                         switch (event.type) {
                             case "response.output_text.delta":
                                 const content = event.delta || "";
-                                const sseChunk = `data:${content}\n\n`
+                                const sseChunk = `data: ${JSON.stringify({ text: content })}\n\n`; 
                                 controller.enqueue(new TextEncoder().encode(sseChunk));
                                 break;
                             default:

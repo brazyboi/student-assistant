@@ -6,26 +6,17 @@ import 'katex/dist/katex.min.css';
 
 const MarkdownRenderer = ({ markdown }: { markdown: string }) => {
   const processedMarkdown = markdown
-    .replace(/\n{3,}/g, '\n\n');
-    
-    return (
-    <div className="
-      prose prose-slate dark:prose-invert 
-      max-w-none break-words
-      
-      prose-h1:text-3xl
-      prose-h2:text-2xl
-      prose-h3:text-xl 
-      
-      prose-p:leading-relaxed 
-      prose-pre:p-0
-      prose-headings:mt-4 prose-headings:mb-2
-      prose-p:my-2
-      prose-ul:my-2 prose-li:my-0
-    ">
+    .replace(/\\\[/g, '$$$')  // Replace \[ with $$
+    .replace(/\\\]/g, '$$$'); // Replace \] with $$
+
+  return (
+    <div className="markdown-content text-left">
       <ReactMarkdown
-        remarkPlugins={[[remarkMath, { singleDollarText: false }], remarkGfm]}
+        remarkPlugins={[remarkMath, remarkGfm]}
         rehypePlugins={[rehypeKatex]}
+        components={{
+            h3: ({node, ...props}) => <h3 className="mt-4 mb-2 font-bold text-2xl" {...props} />
+        }}
       >
         {processedMarkdown}
       </ReactMarkdown>
