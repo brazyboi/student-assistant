@@ -54,7 +54,6 @@ export const useChats = create<ChatsState>((set) => ({
             }
         }),
     
-    // For streaming: update the last AI message with new chunks
     appendToLastMessage: (chatId: number | string | null, chunk: string) =>
         set((state) => {
             if (chatId == null) return state;
@@ -64,14 +63,12 @@ export const useChats = create<ChatsState>((set) => ({
             const messages = [...chat.messages];
             const lastMsg = messages[messages.length - 1];
             
-            // If last message is from AI, append to it
             if (lastMsg?.sender === 'ai') {
                 messages[messages.length - 1] = {
                     ...lastMsg,
                     text: lastMsg.text + chunk
                 };
             } else {
-                // Create new AI message
                 messages.push({
                     sender: 'ai',
                     text: chunk

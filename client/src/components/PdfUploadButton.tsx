@@ -78,7 +78,7 @@ export function PdfUpload() {
             <div className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full"></div>
           )}
           {uploadStatus === 'idle' && <Upload className="w-4 h-4" />}
-          {uploadStatus === 'idle' && 'Upload PDF (MAX 10MB)'}
+          {uploadStatus === 'idle' && ''}
           {uploadStatus === 'uploading' && 'Uploading...'}
           {uploadStatus === 'success' && '✓ Uploaded'}
           {uploadStatus === 'error' && '⚠ Failed'}

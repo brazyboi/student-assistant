@@ -47,13 +47,13 @@ export default function ChatInput({ onSend }: { onSend: (message: string) => voi
 
     return (
         <>
-            <div className="mb-4">
-                <PdfUpload />
-            </div>
             <form 
                 onSubmit={handleSubmit} 
                 className="relative mb-4 justify-center w-full flex gap-2"
             >
+                <div className="mb-4">
+                    <PdfUpload />
+                </div>
                 <Textarea
                     ref={textareaRef}
                     rows={1}
