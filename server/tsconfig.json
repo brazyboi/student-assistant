@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "rootDir": "./src",
     "outDir": "./dist",
     "module": "ESNext",
     "target": "ES2022",
@@ -12,9 +11,9 @@
     "declaration": true,
     "declarationMap": true,
     "strict": true,
-    "baseUrl": "./src",
+    "baseUrl": ".",
     "paths": {
-      "@student-assistant/shared": ["../../shared/src"]
+      "@student-assistant/shared": ["../shared/src"]
     },
     "isolatedModules": true,
     "skipLibCheck": true,
@@ -23,5 +22,8 @@
     "verbatimModuleSyntax": true,
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist"]
+  "exclude": ["node_modules", "dist"],
+  "references": [
+    { "path": "../shared" }
+  ]
 }
