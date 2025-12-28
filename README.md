@@ -1,4 +1,6 @@
 # Student Assistant
+![Deploy Status](https://github.com/brazyboi/student-assistant/actions/workflows/deploy.yml/badge.svg)
+
 An experimental AI chatbot application leveraging Retrieval-Augmented Generation (RAG) and Large Language Models (LLMs) to provide context-aware answers from custom knowledge bases across persistent conversations
 
 ## Demo
