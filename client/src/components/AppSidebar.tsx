@@ -25,7 +25,7 @@ export default function AppSidebar({ chats, onAddChat }: SidebarProps) {
             variant='sidebar'
             style={{ overflowX: 'hidden' }}
         >
-            <SidebarHeader className='text-center text-2xl mt-2'>Problems</SidebarHeader>
+            <SidebarHeader className='text-center text-2xl mt-2'>Chats</SidebarHeader>
             <SidebarContent style={{ overflowX: 'hidden' }}>
                 <SidebarGroup>
                     {chats.map((chat) => (

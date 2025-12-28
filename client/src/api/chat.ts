@@ -112,6 +112,7 @@ export async function streamAttemptFeedback(
         try {
           // Parse the JSON to safely extract text with newlines (\n) preserved
           const parsed = JSON.parse(jsonString);
+          console.log(parsed);
           if (parsed.text) {
              onChunk(parsed.text);
           }
