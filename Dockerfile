@@ -33,21 +33,20 @@ FROM node:20-alpine AS production
 
 WORKDIR /app
 
-# Copy package files
+# Copy root package files
 COPY package*.json ./
+# Copy workspace package files (CRITICAL for module resolution)
 COPY shared/package*.json ./shared/
 COPY server/package*.json ./server/
 
 # Install only production dependencies
-RUN npm ci --omit=dev --workspace=shared --workspace=server
+# Note: We install at the root so it respects the workspace symlinks
+RUN npm ci --omit=dev
 
 # Copy built artifacts from builder
 COPY --from=builder /app/shared/dist ./shared/dist
 COPY --from=builder /app/server/dist ./server/dist
 COPY --from=builder /app/client/dist ./client/dist
-
-# Copy shared package.json for module resolution
-COPY --from=builder /app/shared/package.json ./shared/
 
 # Set production environment
 ENV NODE_ENV=production
@@ -55,5 +54,6 @@ ENV NODE_ENV=production
 # Expose port
 EXPOSE 3000
 
-# Start the server - secrets come from runtime env vars via --env-file
+# Start the server
+# Since your WORKDIR is /app, this looks for /app/server/dist/index.js
 CMD ["node", "server/dist/index.js"]
