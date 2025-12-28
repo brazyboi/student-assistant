@@ -11,6 +11,7 @@ import multer from 'multer';
 import { extractTextFromPDF, chunkText } from './pdfUtils.js';
 import { getUserIdFromToken } from './helpers.js';
 import { addNote } from './noteHandler.js';
+import type { Request, Response } from 'express';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -48,7 +49,7 @@ const upload = multer({
   limits: { fileSize: MAX_SIZE }
 });
 
-app.post('/api/upload-pdf', upload.single('file'), async (req, res) => {
+app.post('/api/upload-pdf', upload.single('file'), async (req: Request, res: Response) => {
   try {
     const userId = await getUserIdFromToken(req.headers.authorization);
     

@@ -1,4 +1,4 @@
-name: Deploy to EC2
+name: Deployment
 
 on:
   push:
@@ -27,7 +27,7 @@ jobs:
 
       # 4. Build the project
       - name: Build project
-        run: npm run build
+        run: npm run build --workspaces --if-present
 
       # 5. Log in to Docker Hub
       - name: Log in to Docker Hub
