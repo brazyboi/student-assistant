@@ -56,4 +56,4 @@ EXPOSE 3000
 
 # Start the server
 # Since your WORKDIR is /app, this looks for /app/server/dist/index.js
-CMD ["node", "server/dist/index.js"]
+CMD ["node", "server/dist/server/src/index.js"]
