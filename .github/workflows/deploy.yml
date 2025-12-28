@@ -49,7 +49,7 @@ jobs:
       - name: Sync .env file to EC2
         run: |
           # Encode the secret to handle newlines safely
-          ENCODED_ENV=$(echo "${{ secrets.DOCKER_ENV }}" | base64 -w 0)
+          ENCODED_ENV=$(echo "${{ secrets.DOCKER_ENV_FILE }}" | base64 -w 0)
 
           COMMAND_ID=$(aws ssm send-command \
             --instance-ids ${{ secrets.EC2_INSTANCE_ID }} \
