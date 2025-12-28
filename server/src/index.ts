@@ -15,22 +15,30 @@ import type { Request, Response } from 'express';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const isProduction = process.env.NODE_ENV === 'production';
 
-dotenv.config({ path: path.join(__dirname, '../.env') });
+if (!isProduction) {
+  dotenv.config({ path: path.join(__dirname, '../.env') });
+}
+// dotenv.config({ path: path.join(__dirname, '../.env') });
 
 const app = express();
 
-const isProduction = process.env.NODE_ENV === 'production';
+// const allowedOrigins = isProduction 
+//   ? (process.env.ALLOWED_ORIGINS || '').split(',').map(o => o.trim())
+//   : ['http://localhost:5173', 'http://localhost:3000'];
 const allowedOrigins = isProduction 
-  ? (process.env.ALLOWED_ORIGINS || '').split(',').map(o => o.trim())
+  ? (process.env.ALLOWED_ORIGINS || '').split(',').map(o => o.trim()).filter(Boolean)
   : ['http://localhost:5173', 'http://localhost:3000'];
 
-// CORS Configuration
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
+    // !origin allows for non-browser requests (like curl or postman)
+    // In production, if frontend and backend are on same domain, origin might be undefined or match
+    if (!origin || allowedOrigins.includes(origin) || isProduction) {
       callback(null, true);
     } else {
+      console.warn(`CORS blocked for origin: ${origin}`);
       callback(new Error('Not allowed by CORS'));
     }
   },
@@ -84,22 +92,21 @@ app.post('/api/upload-pdf', upload.single('file'), async (req: Request, res: Res
 createExpressEndpoints(contract, router, app);
 
 if (isProduction) {
-  const clientDistPath = path.join(__dirname, '../../client/dist');
+  // Use process.cwd() to ensure we are at the /app root in Docker
+  const clientDistPath = path.join(process.cwd(), 'client', 'dist');
   
-  // Serve static files with proper MIME types
-  app.use(express.static(clientDistPath, {
-    setHeaders: (res, filePath) => {
-      if (filePath.endsWith('.css')) {
-        res.setHeader('Content-Type', 'text/css');
-      } else if (filePath.endsWith('.js')) {
-        res.setHeader('Content-Type', 'application/javascript');
-      }
-    }
-  }));
+  console.log(`[Production] Serving static files from: ${clientDistPath}`);
+
+  app.use(express.static(clientDistPath));
   
-  // SPA fallback - MUST be absolute last route
   app.get('*', (req, res) => {
-    res.sendFile(path.join(clientDistPath, 'index.html'));
+    const indexPath = path.join(clientDistPath, 'index.html');
+    res.sendFile(indexPath, (err) => {
+      if (err) {
+        console.error(`[Error] 404 on SPA Fallback. Looked at: ${indexPath}`);
+        res.status(404).send("Frontend assets not found. Check Docker build.");
+      }
+    });
   });
 }
 
