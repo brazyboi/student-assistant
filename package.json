@@ -11,7 +11,8 @@
     "build": "npm run build:shared && npm run build:server && npm run build:client",
     "build:shared": "npm run build -w shared",
     "build:server": "npm run build -w server",
-    "build:client": "npm run build -w client"
+    "build:client": "npm run build -w client",
+    "test": "npm test -w server"
   },
   "dependencies": {
     "@ts-rest/core": "^3.52.1"
