@@ -4,7 +4,7 @@
 An experimental AI chatbot application leveraging Retrieval-Augmented Generation (RAG) and Large Language Models (LLMs) to provide context-aware answers from custom knowledge bases across persistent conversations
 
 ## Demo
-Here is a demo [DOWN RIGHT NOW]: http://studentassistant.dev
+Here is a demo: https://studentassistant.dev
 
 ## Tech Stack
 ### Frontend
