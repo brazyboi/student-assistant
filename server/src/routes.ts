@@ -1,7 +1,7 @@
 import { contract } from "@student-assistant/shared";
 import { addNote } from "./noteHandler.js";
 import pool from "./db.js";
-import { getAIFeedback, getAIFeedbackStream, getUserIdFromToken } from "./helpers.js";
+import { getAIFeedback, getAIFeedbackStream, getUserIdFromToken, getSocraticHint } from "./helpers.js";
 import { initServer } from "@ts-rest/express";
 import { Response } from "node-fetch";
 
@@ -141,6 +141,56 @@ export const router = s.router(contract, {
                 'Cache-Control': 'no-cache',
             },
             body: reader,
+        };
+    },
+    getHint: async ({ body: { user_attempt, current_hint_level }, params, headers }) => {
+        const user_id = await getUserIdFromToken(headers.authorization);
+        const session_id = parseInt(params.session_id);
+
+        const session_res = await pool.query(
+            `SELECT user_id, problem FROM study_sessions WHERE id = $1`,
+            [session_id]
+        );
+
+        if (session_res.rows.length === 0) {
+            throw new Error("Session not found");
+        }
+
+        if (session_res.rows[0].user_id !== user_id) {
+            throw new Error("Unauthorized");
+        }
+
+        const problem = session_res.rows[0].problem;
+
+        // If student is requesting solution directly
+        if (current_hint_level === "partial") {
+            // Return the full solution
+            const hint = await getSocraticHint(user_id, problem, user_attempt, "partial");
+            return {
+                status: 200,
+                body: {
+                    hint: `**Solution:**\n\n${hint}`,
+                    hint_level: "solution"
+                }
+            };
+        }
+
+        // Determine next hint level for non-solution case
+        const hintProgression: Record<string, "conceptual" | "guiding" | "partial"> = {
+            "none": "conceptual",
+            "conceptual": "guiding",
+            "guiding": "partial"
+        };
+
+        const nextLevel = hintProgression[current_hint_level] || "conceptual";
+        const hint = await getSocraticHint(user_id, problem, user_attempt, nextLevel);
+
+        return {
+            status: 200,
+            body: {
+                hint,
+                hint_level: nextLevel
+            }
         };
     },
     addNote: async ({ body: { content }, headers }) => {

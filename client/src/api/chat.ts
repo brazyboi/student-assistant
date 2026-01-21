@@ -1,6 +1,7 @@
 import { supabase } from "../lib/supabaseClient";
 import { initClient } from "@ts-rest/core";
 import { contract } from '@student-assistant/shared';
+import type { HintLevel } from '@/lib/types';
 
 const API_BASE = import.meta.env.VITE_API_URL;
 
@@ -63,6 +64,21 @@ export async function getAttempts(session_id: number) {
 
   if (result.status === 200) return result.body;
   throw new Error(`getAttempts failed: ${result.status}`);
+}
+
+export async function getHint(session_id: number | string, user_attempt: string, current_hint_level: HintLevel) {
+  const { data: sessionData } = await supabase.auth.getSession();
+  const token = sessionData?.session?.access_token;
+  if (!token) throw new Error("User not logged in.");
+
+  const result = await client.getHint({
+    params: { session_id: session_id.toString() },
+    body: { user_attempt, current_hint_level },
+    extraHeaders: { Authorization: `Bearer ${token}` },
+  });
+
+  if (result.status === 200) return result.body;
+  throw new Error(`getHint failed: ${result.status}`);
 }
 
 // Minimal SSE reader that consumes the server ReadableStream and invokes onChunk(text)

@@ -18,6 +18,9 @@ const AttemptSchema = z.object({
     created_at: z.string(),
 });
 
+// Socratic tutor hint levels
+const HintLevelSchema = z.enum(["none", "conceptual", "guiding", "partial", "solution"]);
+
 export const contract = c.router({
     // GET requests
     getStudySessions: {
@@ -80,6 +83,24 @@ export const contract = c.router({
             // 200: z.string()
         },
         summary: "Streams the AI feedback message in chunks in real time.",
+    },
+    getHint: {
+        method: "POST",
+        path: "/sessions/:session_id/hint",
+        pathParams: z.object({
+            session_id: z.string()
+        }),
+        body: z.object({
+            user_attempt: z.string(),
+            current_hint_level: HintLevelSchema
+        }),
+        responses: {
+            200: z.object({
+                hint: z.string(),
+                hint_level: HintLevelSchema
+            })
+        },
+        summary: "Get the next hint level for a problem."
     },
     addNote: {
         method: 'POST',
