@@ -5,11 +5,11 @@ import {
     SidebarGroup,
     SidebarHeader,
 } from '@/components/ui/sidebar';
-import ChatTab from '@/components/ChatTab.tsx';
+import ChatTab from '@/components/chatpage/ChatTab';
 
 import type { Chat } from '@/lib/types';
 import { useChats } from '@/lib/state';
-import AddChatButton from '@/components/AddChatButton';
+import AddChatButton from '@/components/chatpage/AddChatButton';
 
 interface SidebarProps {
     chats: Chat[],

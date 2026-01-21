@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import ChatMessage from "./ChatMessage";
-import StickyProblem from '@/components/StickyProblem';
-import type { Message } from "../lib/types";
+import StickyProblem from '@/components/chatpage/StickyProblem';
+import type { Message } from "../../lib/types";
 
 type ChatWindowProps = {
   messages: Message[];

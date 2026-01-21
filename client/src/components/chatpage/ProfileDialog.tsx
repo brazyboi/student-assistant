@@ -16,8 +16,8 @@ import {
 } from '@/components/ui/dialog';
 
 
-import { supabase } from "../lib/supabaseClient";
-import type { Profile } from "../lib/types";
+import { supabase } from "../../lib/supabaseClient";
+import type { Profile } from "../../lib/types";
 
 interface ProfileDialogProps {
   dialogType: 'create' | 'login';

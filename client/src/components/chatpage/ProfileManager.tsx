@@ -16,7 +16,7 @@ import { getSessions } from "@/api/chat";
 import ProfileDialog from "./ProfileDialog";
 import { supabase } from "@/lib/supabaseClient";
 
-import type { Profile } from "../lib/types"
+import type { Profile } from "../../lib/types"
 
 export default function ProfileManager() {
   const activeUser = useActiveUser((s) => s.activeUser);

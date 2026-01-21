@@ -1,11 +1,11 @@
-import ChatInput from "@/components/ChatInput";
-import ChatWindow from "@/components/ChatWindow";
-import ProfileManager from "@/components/ProfileManager"
-import Notepad from "@/components/Notepad";
-import HintButtons from "@/components/HintButtons";
+import ChatInput from "@/components/chatpage/ChatInput";
+import ChatWindow from "@/components/chatpage/ChatWindow";
+import ProfileManager from "@/components/chatpage/ProfileManager"
+import Notepad from "@/components/chatpage/Notepad";
+import HintButtons from "@/components/chatpage/HintButtons";
 import { useChatActions } from "@/hooks/useChatActions";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import AppSidebar from "@/components/AppSidebar";
+import AppSidebar from "@/components/chatpage/AppSidebar";
 
 export default function ChatPage() {
   const { chats, selectedChat, loadingAiFeedback, startNewSession, addAttemptMessage, requestHint, requestSolution, addEmptyChat } = useChatActions();

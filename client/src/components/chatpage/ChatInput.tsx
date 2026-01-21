@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea'
 import { Send } from 'lucide-react';
 import { useChats } from '@/lib/state';
-import { PdfUpload } from '@/components/PdfUploadButton';
+import { PdfUpload } from '@/components/chatpage/PdfUploadButton';
 
 export default function ChatInput({ onSend }: { onSend: (message: string) => void }) {
     const [message, setMessage] = React.useState('');

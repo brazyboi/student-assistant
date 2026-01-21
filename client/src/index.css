@@ -2,6 +2,7 @@
 @import "tw-animate-css";
 @plugin "@tailwindcss/typography";
 @import 'katex/dist/katex.min.css'; 
+@import url(https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&display=swap);
 
 @custom-variant dark (&:is(.dark *));
 
@@ -49,7 +50,7 @@
   --sidebar-border: #D7CCC8;
   --sidebar-ring: #546E7A;
 
-  --font-sans: Geist, sans-serif;
+  --font-sans: "Figtree", sans-serif;
   --font-serif: "Lora", Georgia, serif;
   --font-mono: "Fira Code", "Courier New", monospace;
   --radius: 0.5rem;
@@ -114,7 +115,7 @@
   --sidebar-border: #424242;
   --sidebar-ring: #78909C;
 
-  --font-sans: Geist, sans-serif;
+  --font-sans: "Figtree", sans-serif;
   --font-serif: "Lora", Georgia, serif;
   --font-mono: "Fira Code", "Courier New", monospace;
   --radius: 0.5rem;

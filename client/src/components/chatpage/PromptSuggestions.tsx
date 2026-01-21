@@ -1,5 +1,5 @@
 import React from "react";
-import type { QueryMode } from "../lib/types";
+import type { QueryMode } from "../../lib/types";
 
 interface PromptSuggestionsProps {
   prompts: string[];
