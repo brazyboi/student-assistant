@@ -19,6 +19,8 @@ export default function App() {
            {/* <Route path="/profile" element={<ProfilePage />} /> */}
         </Route>
 
+        <Route path="*" element={<LandingPage />} />
+
       </Routes>
     </BrowserRouter>
   );
