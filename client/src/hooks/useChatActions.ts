@@ -1,5 +1,5 @@
-import { startSession, addAttempt, streamAttemptFeedback } from '@/api/chat';
-import type { Chat } from '@/lib/types';
+import { startSession, addAttempt, streamAttemptFeedback, getHint } from '@/api/chat';
+import type { Chat, HintLevel } from '@/lib/types';
 import { useChats, useActiveUser } from '@/lib/state';
 
 function generateUUID() {
@@ -14,7 +14,7 @@ function generateUUID() {
 
 export function useChatActions() {
   const activeUser = useActiveUser((s) => s.activeUser);
-  const { chats, addChat, setChats, updateChatMessages, selectedChatId, setSelectedChatId, loadingAiFeedback, setLoadingAiFeedback, appendToLastMessage } = useChats();
+  const { chats, addChat, setChats, updateChatMessages, selectedChatId, setSelectedChatId, loadingAiFeedback, setLoadingAiFeedback, appendToLastMessage, updateTutorState } = useChats();
 
   const selectedChat = chats.find((c) => c.id === selectedChatId);
 
@@ -30,6 +30,11 @@ export function useChatActions() {
       title: problemTitle,
       profile_id: activeUser.id,
       messages: [{sender: 'user', text: problem}],
+      tutorState: {
+        currentHintLevel: "none",
+        userHasAttempted: false,
+        studentInput: ""
+      }
     };
     addChat(tempSession);
     setSelectedChatId(tempId);
@@ -44,13 +49,17 @@ export function useChatActions() {
         profile_id: activeUser.id,
         title: problemTitle || `Session ${result.id}`,
         messages: [{ sender: "user", text: problem }],
+        tutorState: {
+          currentHintLevel: "none",
+          userHasAttempted: false,
+          studentInput: ""
+        }
       };
 
       setChats([
         newChat,
         ...chats.filter((c) => c.id !== tempId),
       ]);
-      // addChat(newChat);
       setSelectedChatId(newChat.id);
     } catch (err) {
       console.error('Error adding session', err);
@@ -62,32 +71,68 @@ export function useChatActions() {
     }
   }
 
-  // async function addAttemptMessage(text: string) {
-  //   if (!selectedChat) return;
-  //   if (loadingAiFeedback) return;
-  //   updateChatMessages(selectedChat.id, [{ sender: "user", text }]);
-
-  //   setLoadingAiFeedback(true);
-  //   try {
-  //     const result = await addAttempt(selectedChat.id, text);
-  //     const aiFeedback = (result as any)?.ai_feedback ?? "";
-  //     updateChatMessages(selectedChat.id, [{ sender: "ai", text: aiFeedback }]);
-  //   } finally {
-  //     setLoadingAiFeedback(false);
-  //   }
-  // }
   async function addAttemptMessage(text: string) {
     if (!selectedChat) return;
     if (loadingAiFeedback) return;
+    
+    // Store the student's attempt in tutor state
+    updateTutorState(selectedChat.id, "none", true, text);
+    
     updateChatMessages(selectedChat.id, [{ sender: "user", text }]);
     setLoadingAiFeedback(true);
     
     try {
-      const result = await streamAttemptFeedback(selectedChat.id, text, (chunk) => {
+      await streamAttemptFeedback(selectedChat.id, text, (chunk) => {
         appendToLastMessage(selectedChat.id, chunk);
       });
-      let aiFeedback = "";
+    } finally {
+      setLoadingAiFeedback(false);
+    }
+  }
 
+  async function requestHint() {
+    if (!selectedChat || !selectedChat.tutorState) return;
+    if (loadingAiFeedback) return;
+
+    setLoadingAiFeedback(true);
+    try {
+      const result = await getHint(
+        selectedChat.id,
+        selectedChat.tutorState.studentInput,
+        selectedChat.tutorState.currentHintLevel
+      );
+
+      // Update tutor state with new hint level
+      updateTutorState(selectedChat.id, result.hint_level, true, selectedChat.tutorState.studentInput);
+
+      // Add hint to chat as AI message
+      updateChatMessages(selectedChat.id, [{ sender: "ai", text: result.hint }]);
+    } catch (err) {
+      console.error('Error getting hint', err);
+    } finally {
+      setLoadingAiFeedback(false);
+    }
+  }
+
+  async function requestSolution() {
+    if (!selectedChat || !selectedChat.tutorState) return;
+    if (loadingAiFeedback) return;
+
+    setLoadingAiFeedback(true);
+    try {
+      const result = await getHint(
+        selectedChat.id,
+        selectedChat.tutorState.studentInput,
+        "partial"
+      );
+
+      // Update tutor state to solution unlocked
+      updateTutorState(selectedChat.id, "solution", true, selectedChat.tutorState.studentInput);
+
+      // Add solution to chat as AI message
+      updateChatMessages(selectedChat.id, [{ sender: "ai", text: result.hint }]);
+    } catch (err) {
+      console.error('Error requesting solution', err);
     } finally {
       setLoadingAiFeedback(false);
     }
@@ -103,7 +148,9 @@ export function useChatActions() {
     selectedChat, 
     loadingAiFeedback, 
     startNewSession, 
-    addAttemptMessage, 
+    addAttemptMessage,
+    requestHint,
+    requestSolution,
     addEmptyChat 
   };
 }

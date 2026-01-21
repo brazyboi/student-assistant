@@ -2,12 +2,13 @@ import ChatInput from "@/components/ChatInput";
 import ChatWindow from "@/components/ChatWindow";
 import ProfileManager from "@/components/ProfileManager"
 import Notepad from "@/components/Notepad";
+import HintButtons from "@/components/HintButtons";
 import { useChatActions } from "@/hooks/useChatActions";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import AppSidebar from "@/components/AppSidebar";
 
 export default function ChatPage() {
-  const { chats, selectedChat, loadingAiFeedback, startNewSession, addAttemptMessage, addEmptyChat } = useChatActions();
+  const { chats, selectedChat, loadingAiFeedback, startNewSession, addAttemptMessage, requestHint, requestSolution, addEmptyChat } = useChatActions();
 
   return (
     <div className="flex h-screen">
@@ -30,6 +31,15 @@ export default function ChatPage() {
                 <ChatWindow messages={selectedChat.messages} loading={loadingAiFeedback}/>
               </div>
               <ChatInput onSend={addAttemptMessage} />
+              {selectedChat.tutorState && (
+                <HintButtons
+                  onGetHint={requestHint}
+                  onImStuck={requestSolution}
+                  currentHintLevel={selectedChat.tutorState.currentHintLevel}
+                  studentHasAttempted={selectedChat.tutorState.userHasAttempted}
+                  loading={loadingAiFeedback}
+                />
+              )}
             </div>
             <div className="w-100 flex flex-col min-h-0">
               <Notepad />

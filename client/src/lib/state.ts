@@ -1,4 +1,4 @@
-import type { Profile, Chat, Message } from '@/lib/types';
+import type { Profile, Chat, Message, HintLevel } from '@/lib/types';
 import { create } from 'zustand';
 
 const MESSAGE_COOLDOWN_MS = 1500;
@@ -19,6 +19,8 @@ interface ChatsState {
     setSelectedChatId: (id: number | string | null) => void,
     updateChatMessages: (chatId: number | string | null, messages: Message[]) => void,
     appendToLastMessage: (chatId: number | string | null, chunk: string) => void,
+
+    updateTutorState: (chatId: number | string | null, hintLevel: HintLevel, userHasAttempted: boolean, studentInput: string) => void,
 
     loadingAiFeedback: boolean,
     setLoadingAiFeedback: (loading: boolean) => void,
@@ -78,6 +80,23 @@ export const useChats = create<ChatsState>((set) => ({
             return {
                 chats: state.chats.map(c =>
                     c.id === chatId ? {...c, messages} : c
+                )
+            };
+        }),
+
+    updateTutorState: (chatId: number | string | null, hintLevel: HintLevel, userHasAttempted: boolean, studentInput: string) =>
+        set((state) => {
+            if (chatId == null) return state;
+            return {
+                chats: state.chats.map(c =>
+                    c.id === chatId ? {
+                        ...c,
+                        tutorState: {
+                            currentHintLevel: hintLevel,
+                            userHasAttempted,
+                            studentInput
+                        }
+                    } : c
                 )
             };
         }),
